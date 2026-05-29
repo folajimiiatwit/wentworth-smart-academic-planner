@@ -14,3 +14,6 @@ class CompletedCoursesRequest(BaseModel):
   humanities_elective_credits: int
   social_science_elective_credits: int
   ethics_elective_credits: int
+
+class ScheduleCheckRequest(BaseModel):
+    selected_courses: List[str]
