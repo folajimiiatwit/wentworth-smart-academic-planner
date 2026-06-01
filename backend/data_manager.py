@@ -3,7 +3,7 @@ import pandas as pd
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = BASE_DIR/"data"
-REQUIRED_COURSES_FILE = DATA_DIR/"required_courses.csv"
+REQUIRED_COURSES_FILE = DATA_DIR/"cs_required_courses.csv"
 SEMESTER_COURSES_FILE = DATA_DIR/"semester_courses.csv"
 USERS_FILE = DATA_DIR/"users.csv"
 
