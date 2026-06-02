@@ -9,7 +9,7 @@ def login_user(username):
 
   if username not in existing_usernames:
     new_user_data = {
-      "username":username, "completed_required_courses":"",
+      "username":username, "completed_required_courses":"","custom_completed_courses": "",
       "planned_courses": ""
     }
 
