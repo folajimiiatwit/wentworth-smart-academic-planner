@@ -23,7 +23,7 @@ def load_semester_courses():
     return pd.read_csv(SEMESTER_COURSES_FILE).fillna("")
     
 def load_users():
-    columns = ["username", "completed_required_courses"]+ELECTIVE_COLUMNS+["planned_courses"]
+    columns = ["username", "completed_required_courses", "custom_completed_courses"]+ELECTIVE_COLUMNS+["planned_courses"]
     if not USERS_FILE.exists():
         users = pd.DataFrame(columns=columns)
         users.to_csv(USER_FILE, index=False)
@@ -60,7 +60,9 @@ def get_completed_required_courses(username):
         if stripped_course:
             courses.append(stripped_course)
     return courses
-        
+
+
+
 def get_elective_credits(username):
     user=get_user(username)
     credits = {}
@@ -84,5 +86,56 @@ def save_completed_info(username, completed_required_courses, elective_credit_da
 
     for column in ELECTIVE_COLUMNS:
         users.loc[index[0],column]= int( elective_credit_data.get(column,0))
+    save_users(users)
+    return True
+
+def get_custom_completed_courses(username):
+    user = get_user(username)
+    if user is None:
+        return []
+
+    completed = str(user.get("custom_completed_courses", ""))
+    if completed.strip() == "":
+        return []
+
+    custom_courses = []
+    for item in completed.split(";"):
+        parts = item.split("|")
+        if len(parts) >= 3:
+            custom_courses.append({
+                "course_code": parts[0].strip(),
+                "course_number": parts[1].strip(),
+                "title": parts[2].strip()
+            })
+
+    return custom_courses
+
+
+def get_all_completed_course_codes(username):
+    required_courses = get_completed_required_courses(username)
+    custom_courses = get_custom_completed_courses(username)
+    custom_codes = [course["course_code"] for course in custom_courses]
+    return required_courses + custom_codes
+
+
+def save_custom_completed_courses(username, custom_courses):
+    username = username.strip().lower()
+    users = load_users()
+
+    index = users[users["username"].astype(str).str.lower() == username].index
+
+    if len(index) == 0:
+        return False
+
+    encoded_courses = []
+    for course in custom_courses:
+        course_code = str(course.get("course_code", "")).strip().upper()
+        course_number = str(course.get("course_number", "")).strip()
+        title = str(course.get("title", "")).strip()
+
+        if course_code:
+            encoded_courses.append(f"{course_code}|{course_number}|{title}")
+
+    users.loc[index[0], "custom_completed_courses"] = ";".join(encoded_courses)
     save_users(users)
     return True
