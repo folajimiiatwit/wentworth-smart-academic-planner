@@ -17,3 +17,12 @@ class CompletedCoursesRequest(BaseModel):
 
 class ScheduleCheckRequest(BaseModel):
     selected_courses: List[str]
+
+class CustomCompletedCourse(BaseModel):
+    course_code: str
+    course_number: str
+    title: str
+
+class CustomCompletedCoursesRequest(BaseModel):
+    username: str
+    custom_completed_courses: List[CustomCompletedCourse]
