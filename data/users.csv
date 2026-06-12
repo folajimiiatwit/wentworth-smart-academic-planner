@@ -1,2 +1,2 @@
-username,completed_required_courses,general_elective_credits,cs_elective_credits,english_elective_credits,science_elective_credits,humanities_elective_credits,social_science_elective_credits,ethics_elective_credits,planned_courses
-demo,COMP1000;COMP1050;MATH2300,4,8,4,0,4,0,0,
+username,completed_required_courses,custom_completed_courses, general_elective_credits,cs_elective_credits,english_elective_credits,science_elective_credits,humanities_elective_credits,social_science_elective_credits,ethics_elective_credits,planned_courses
+demo,COMP1000;COMP1050;MATH2300,,4,8,4,0,4,0,0,
