@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from backend.models import LoginRequest,CompletedCoursesRequest, ScheduleCheckRequest, CustomCompletedCoursesRequest
 from backend.auth import login_user
-from backend.data_manager import (load_required_courses, load_semester_courses, get_completed_required_courses, get_elective_credits,save_completed_info,save_custom_completed_courses)
+from backend.data_manager import (load_required_courses, load_semester_courses, get_completed_required_courses, get_custom_completed_courses, get_all_completed_course_codes, get_elective_credits,save_completed_info,save_custom_completed_courses)
 from backend.planner import (add_course_groups,get_eligible_semester_courses,get_blocked_semester_courses,required_progress,check_schedule)
 
 app = FastAPI(title="Wentworth Smart Planner")

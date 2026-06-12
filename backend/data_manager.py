@@ -26,7 +26,7 @@ def load_users():
     columns = ["username", "completed_required_courses", "custom_completed_courses"]+ELECTIVE_COLUMNS+["planned_courses"]
     if not USERS_FILE.exists():
         users = pd.DataFrame(columns=columns)
-        users.to_csv(USER_FILE, index=False)
+        users.to_csv(USERS_FILE, index=False)
 
     users=pd.read_csv(USERS_FILE).fillna("")
 
@@ -58,8 +58,8 @@ def get_completed_required_courses(username):
     for course in completed.split(";"):
         stripped_course=course.strip()
         if stripped_course:
-            courses.append(stripped_course)
-    return courses
+            course.append(stripped_course)
+    return course
 
 
 

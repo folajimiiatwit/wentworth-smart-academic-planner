@@ -40,10 +40,14 @@ def tokenize_prerequisite_rule(rule):
     if current:
         tokens.append(current)
     return tokens
+
 def evaluate_prerequisite_rule(prerequisite_text, completed_courses):
+    
     prerequisite_text = str(prerequisite_text).strip()
+
     if prerequisite_text == "" or prerequisite_text.lower() == "nan":
         return True
+    
     completed_set = set()
 
     for course in completed_courses:
@@ -52,6 +56,16 @@ def evaluate_prerequisite_rule(prerequisite_text, completed_courses):
     tokens = tokenize_prerequisite_rule(prerequisite_text)
     position = 0
 
+    def parse_term():
+        nonlocal position
+        value = parse_factor()
+
+        while position < len(tokens) and tokens[position] == "&":
+            position += 1
+            value = value and parse_factor()
+
+        return value
+    
     def parse_expression():
         nonlocal position
         value = parse_term()
@@ -61,6 +75,7 @@ def evaluate_prerequisite_rule(prerequisite_text, completed_courses):
             value = value or parse_term()
 
         return value
+    
     def parse_factor():
         nonlocal position
 
@@ -245,7 +260,9 @@ def find_conflicts(selected_courses_df):
     return conflicts
     
 def check_schedule(semester_courses_df, selected_course_sections):
+    
     semester_courses_df = semester_courses_df.copy()
+    
     if "crn" in semester_courses_df.columns:
         semester_courses_df["course_section"] = semester_courses_df["crn"].astype(str)
     else:
