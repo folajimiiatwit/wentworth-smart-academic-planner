@@ -35,7 +35,7 @@ def load_users():
             if column in ELECTIVE_COLUMNS:
                 users[column]=0
             else:
-                ""
+                users[column] = ""
     return users[columns]
 def save_users(users_df):
     users_df.to_csv(USERS_FILE, index=False)
@@ -51,15 +51,19 @@ def get_completed_required_courses(username):
     user= get_user(username)
     if user is None:
         return []
-    completed_courses=user.get("completed_required_courses","")
-    completed = str(completed_courses)
+    
+    completed = str(user.get("completed_required_courses", ""))
+    
     if completed.strip()=="":
         return []
+    
+    courses = []
+
     for course in completed.split(";"):
         stripped_course=course.strip()
         if stripped_course:
-            course.append(stripped_course)
-    return course
+            courses.append(stripped_course)
+    return courses
 
 
 
