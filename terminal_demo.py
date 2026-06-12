@@ -262,7 +262,7 @@ def build_schedule(username):
 
 
 def main():
-    print_header("Wentworth Smart Academic Planner - Demo")
+    print_header("Wentworth Smart Planner - Demo")
     username = required_input("Enter username: ").lower()
 
     result = login_user(username)
