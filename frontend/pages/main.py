@@ -1,4 +1,3 @@
-
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -14,11 +13,11 @@ st.markdown("""
     }
     .header-style {
         background: linear-gradient(135deg, #6a00fc 0%, #ffa10c 80%);
-        padding: 30px;
-        border-radius: 15px;
+        padding: 10px;
+        border-radius: 5px;
         color: white;
-        margin-bottom: 30px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        margin-bottom: 10px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
 </style>
 """, unsafe_allow_html=True)
@@ -30,6 +29,12 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 st.set_page_config(page_title='Wentworth Smart Academic Planner', layout="wide")
+
+with st.container():
+    if st.button("Calendar App"):
+        st.switch_page("pages/main.py")
+    if st.button("Course Selection"):
+        st.switch_page("pages/courseselection.py")
 
 
 calendar_options = {
