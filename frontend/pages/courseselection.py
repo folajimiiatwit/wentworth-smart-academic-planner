@@ -29,6 +29,9 @@ st.set_page_config(page_title='Wentworth Smart Academic Planner', layout="wide")
 
 st.write("Hi this is where the meat and potatoes of the app will be ")
 
+#* note to self add a view of the calendar and split it in half such that there's the ability to pick classes and stuff while watching in real time 
+# page flow will be 
+
 with st.container():
     if st.button("Calendar App"):
         st.switch_page("pages/main.py")
