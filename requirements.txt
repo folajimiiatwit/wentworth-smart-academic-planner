@@ -1,7 +1,9 @@
 streamlit
-streamlit-calendar
 fastapi
 uvicorn
 pandas
 requests
 pillow
+python-docx
+python-multipart
+pdfplumber

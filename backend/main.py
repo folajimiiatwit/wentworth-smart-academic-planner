@@ -93,3 +93,32 @@ def check_selected_schedule(request: ScheduleCheckRequest):
     semester_df = load_semester_courses()
     return check_schedule(semester_df, request.selected_courses)
 
+import os
+from dotenv import load_dotenv
+from openai import OpenAI
+
+#load variables from the .env file
+load_dotenv()
+
+#initialize the OpenAI client automatically using the environment variable
+client = OpenAI()
+
+def ask_ai(prompt: str) -> str:
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4o",  # Specify your desired model
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.7
+        )
+        # Extract and return the generated text
+        return response.choices[0].message.content
+    except Exception as e:
+        return f"An error occurred: {e}"
+
+# Test the function
+if __name__ == "__main__":
+    user_prompt = "Explain quantum computing in one simple sentence."
+    print("AI Response:", ask_ai(user_prompt))

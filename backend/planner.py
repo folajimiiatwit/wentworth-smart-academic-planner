@@ -10,24 +10,34 @@ ELECTIVE_REQUIREMENTS = {
     "social_science_elective_credits": 4,
     "ethics_elective_credits": 4
 }
+
+
 def get_course_group(course_code):
     match = re.match(r"([A-Za-z]+)", str(course_code).strip())
     if match:
         return match.group(1).upper()
     return "OTHER"
-    
+
+
 def add_course_groups(df):
     df = df.copy()
     df["group"] = df["course_code"].apply(get_course_group)
     return df
-    
+
+
 def clean_course_code(course_code):
     return str(course_code).strip()
 
+
 def tokenize_prerequisite_rule(rule):
+    """
+    Tokenizes prerequisite expressions such as:
+    COMP1050&(MATH2300|MATH2800)
+    """
     rule = str(rule).replace(" ", "").strip()
     tokens = []
     current = ""
+
     for char in rule:
         if char.isalnum():
             current += char
@@ -37,24 +47,41 @@ def tokenize_prerequisite_rule(rule):
                 current = ""
             if char in ["&", "|", "(", ")"]:
                 tokens.append(char)
+
     if current:
         tokens.append(current)
+
     return tokens
 
+
 def evaluate_prerequisite_rule(prerequisite_text, completed_courses):
-    
+    """
+    Evaluates prerequisite rules with &, |, and parentheses.
+
+    Examples:
+    COMP1000
+    COMP1000|ELEC3150
+    COMP1000&MATH2300
+    COMP1050&(MATH2300|MATH2800)
+    """
     prerequisite_text = str(prerequisite_text).strip()
 
     if prerequisite_text == "" or prerequisite_text.lower() == "nan":
         return True
-    
-    completed_set = set()
 
-    for course in completed_courses:
-        cleaned_course = clean_course_code(course)
-        completed_set.add(cleaned_course)
+    completed_set = set(clean_course_code(course) for course in completed_courses)
     tokens = tokenize_prerequisite_rule(prerequisite_text)
     position = 0
+
+    def parse_expression():
+        nonlocal position
+        value = parse_term()
+
+        while position < len(tokens) and tokens[position] == "|":
+            position += 1
+            value = value or parse_term()
+
+        return value
 
     def parse_term():
         nonlocal position
@@ -65,17 +92,7 @@ def evaluate_prerequisite_rule(prerequisite_text, completed_courses):
             value = value and parse_factor()
 
         return value
-    
-    def parse_expression():
-        nonlocal position
-        value = parse_term()
 
-        while position < len(tokens) and tokens[position] == "|":
-            position += 1
-            value = value or parse_term()
-
-        return value
-    
     def parse_factor():
         nonlocal position
 
@@ -99,7 +116,9 @@ def evaluate_prerequisite_rule(prerequisite_text, completed_courses):
     try:
         return parse_expression()
     except Exception:
-        return False   
+        return False
+
+
 def missing_prerequisites(prerequisite_text, completed_courses):
     prerequisite_text = str(prerequisite_text).strip()
 
@@ -110,6 +129,7 @@ def missing_prerequisites(prerequisite_text, completed_courses):
         return ""
 
     return "Prerequisite not met: " + prerequisite_text
+
 
 def get_eligible_semester_courses(semester_courses_df, completed_courses):
     eligible_rows = []
@@ -129,6 +149,7 @@ def get_eligible_semester_courses(semester_courses_df, completed_courses):
     eligible_df = semester_courses_df.loc[[row.name for row in eligible_rows]]
     return add_course_groups(eligible_df)
 
+
 def get_blocked_semester_courses(semester_courses_df, completed_courses):
     blocked = []
 
@@ -147,6 +168,8 @@ def get_blocked_semester_courses(semester_courses_df, completed_courses):
             blocked.append(item)
 
     return blocked
+
+
 def elective_progress(elective_credits):
     results = []
     total_completed = 0
@@ -182,6 +205,7 @@ def elective_progress(elective_credits):
 
     return results, total_completed, total_required
 
+
 def required_progress(required_courses_df, completed_required_courses, elective_credits):
     total_required_credits = int(required_courses_df["credits"].sum())
     completed_df = required_courses_df[required_courses_df["course_code"].isin(completed_required_courses)]
@@ -198,6 +222,7 @@ def required_progress(required_courses_df, completed_required_courses, elective_
     total_percent = round((total_completed_credits / total_degree_demo_credits) * 100, 1) if total_degree_demo_credits else 0
 
     remaining_df = add_course_groups(remaining_df)
+
     return {
         "completed_required_credits": completed_required_credits,
         "completed_elective_credits": completed_elective_credits,
@@ -210,7 +235,13 @@ def required_progress(required_courses_df, completed_required_courses, elective_
         "elective_details": elective_details,
         "remaining_required_courses": remaining_df.to_dict(orient="records")
     }
+
+
 def time_to_minutes(time_text):
+    """
+    Convert time text into minutes.
+    Supports both 24-hour times like 13:30 and 12-hour times like 03:30pm.
+    """
     time_text = str(time_text).strip().lower()
 
     if time_text == "" or time_text == "nan":
@@ -224,9 +255,11 @@ def time_to_minutes(time_text):
             continue
 
     return None
-    
+
+
 def days_overlap(days_1, days_2):
     return any(day in days_2 for day in days_1)
+
 
 def courses_conflict(course_1, course_2):
     if not days_overlap(course_1["days"], course_2["days"]):
@@ -241,6 +274,7 @@ def courses_conflict(course_1, course_2):
         return False
 
     return first_start < second_end and second_start < first_end
+
 
 def find_conflicts(selected_courses_df):
     conflicts = []
@@ -258,11 +292,10 @@ def find_conflicts(selected_courses_df):
                 })
 
     return conflicts
-    
+
+
 def check_schedule(semester_courses_df, selected_course_sections):
-    
     semester_courses_df = semester_courses_df.copy()
-    
     if "crn" in semester_courses_df.columns:
         semester_courses_df["course_section"] = semester_courses_df["crn"].astype(str)
     else:
@@ -281,3 +314,5 @@ def check_schedule(semester_courses_df, selected_course_sections):
         "total_credits": total_credits,
         "conflicts": conflicts
     }
+
+
