@@ -1,6 +1,14 @@
 from fastapi import FastAPI, UploadFile, File
-from backend.models import LoginRequest, CompletedCoursesRequest, ScheduleCheckRequest, CustomCompletedCoursesRequest, TranscriptSaveRequest
+from backend.models import (
+    LoginRequest,
+    CompletedCoursesRequest,
+    ScheduleCheckRequest,
+    CustomCompletedCoursesRequest,
+    TranscriptSaveRequest,
+    CurriculumMapRequest
+)
 from backend.auth import login_user
+from backend.ai_curriculum import generate_curriculum_map
 from backend.data_manager import (
     load_required_courses,
     load_semester_courses,
@@ -11,7 +19,11 @@ from backend.data_manager import (
     save_completed_info,
     save_custom_completed_courses
 )
-from backend.transcript_parser import extract_text_from_file, extract_completed_courses_from_text, split_required_and_custom
+from backend.transcript_parser import (
+    extract_text_from_file, 
+    extract_completed_courses_from_text, 
+    split_required_and_custom
+)
 from backend.planner import (
     add_course_groups,
     get_eligible_semester_courses,
@@ -157,3 +169,34 @@ def save_transcript_courses(request: TranscriptSaveRequest):
 def check_selected_schedule(request: ScheduleCheckRequest):
     semester_df = load_semester_courses()
     return check_schedule(semester_df, request.selected_courses)
+
+@app.post("/curriculum-map")
+def curriculum_map(request: CurriculumMapRequest):
+    required_df = load_required_courses()
+    semester_df = load_semester_courses()
+
+    completed = get_completed_required_courses(request.username)
+    elective_credits = get_elective_credits(request.username)
+
+    progress_data = required_progress(
+        required_df,
+        completed,
+        elective_credits
+    )
+
+    remaining_required_courses = progress_data["remaining_required_courses"]
+    elective_details = progress_data["elective_details"]
+
+    semester_courses = semester_df.to_dict(orient="records")
+
+    ai_response = generate_curriculum_map(
+        completed_required_courses=completed,
+        remaining_required_courses=remaining_required_courses,
+        elective_details=elective_details,
+        semester_courses=semester_courses,
+    )
+
+    return {
+        "username": request.username,
+        "curriculum_map": ai_response
+    }

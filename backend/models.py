@@ -32,7 +32,8 @@ class CustomCompletedCoursesRequest(BaseModel):
     username: str
     custom_completed_courses: List[CustomCompletedCourse]
 
-
+class CurriculumMapRequest(BaseModel):
+    username: str
 
 class TranscriptSaveRequest(BaseModel):
     username: str
