@@ -1,10 +1,27 @@
-from fastapi import FastAPI
-from backend.models import LoginRequest,CompletedCoursesRequest, ScheduleCheckRequest, CustomCompletedCoursesRequest
+from fastapi import FastAPI, UploadFile, File
+from backend.models import LoginRequest, CompletedCoursesRequest, ScheduleCheckRequest, CustomCompletedCoursesRequest, TranscriptSaveRequest
 from backend.auth import login_user
-from backend.data_manager import (load_required_courses, load_semester_courses, get_completed_required_courses, get_custom_completed_courses, get_all_completed_course_codes, get_elective_credits,save_completed_info,save_custom_completed_courses)
-from backend.planner import (add_course_groups,get_eligible_semester_courses,get_blocked_semester_courses,required_progress,check_schedule)
+from backend.data_manager import (
+    load_required_courses,
+    load_semester_courses,
+    get_completed_required_courses,
+    get_custom_completed_courses,
+    get_all_completed_course_codes,
+    get_elective_credits,
+    save_completed_info,
+    save_custom_completed_courses
+)
+from backend.transcript_parser import extract_text_from_file, extract_completed_courses_from_text, split_required_and_custom
+from backend.planner import (
+    add_course_groups,
+    get_eligible_semester_courses,
+    get_blocked_semester_courses,
+    required_progress,
+    check_schedule
+)
 
-app = FastAPI(title="Wentworth Smart Planner")
+app = FastAPI(title="Wentworth Smart Academic Planner API")
+
 
 @app.get("/health")
 def health_check():
@@ -88,37 +105,55 @@ def progress(username: str):
     return required_progress(required_df, completed, elective_credits)
 
 
+
+
+
+
+@app.post("/parse-transcript")
+async def parse_transcript(file: UploadFile = File(...)):
+    file_bytes = await file.read()
+    transcript_text = extract_text_from_file(file.filename, file_bytes)
+    extracted_codes = extract_completed_courses_from_text(transcript_text)
+
+    required_df = load_required_courses()
+    required_codes = required_df["course_code"].astype(str).str.strip().tolist()
+
+    completed_required, custom_completed = split_required_and_custom(
+        extracted_codes,
+        required_codes
+    )
+
+    return {
+        "filename": file.filename,
+        "all_extracted_courses": extracted_codes,
+        "completed_required_courses": completed_required,
+        "custom_completed_courses": custom_completed
+    }
+
+
+@app.post("/save-transcript-courses")
+def save_transcript_courses(request: TranscriptSaveRequest):
+    elective_data = get_elective_credits(request.username)
+
+    save_completed_info(
+        request.username,
+        request.completed_required_courses,
+        elective_data
+    )
+
+    custom_courses = [
+        course.dict()
+        for course in request.custom_completed_courses
+    ]
+
+    save_custom_completed_courses(request.username, custom_courses)
+
+    return {"message": "Transcript courses saved"}
+
+
+
+
 @app.post("/check-schedule")
 def check_selected_schedule(request: ScheduleCheckRequest):
     semester_df = load_semester_courses()
     return check_schedule(semester_df, request.selected_courses)
-
-import os
-from dotenv import load_dotenv
-from openai import OpenAI
-
-#load variables from the .env file
-load_dotenv()
-
-#initialize the OpenAI client automatically using the environment variable
-client = OpenAI()
-
-def ask_ai(prompt: str) -> str:
-    try:
-        response = client.chat.completions.create(
-            model="gpt-4o",  # Specify your desired model
-            messages=[
-                {"role": "system", "content": "You are a helpful assistant."},
-                {"role": "user", "content": prompt}
-            ],
-            temperature=0.7
-        )
-        # Extract and return the generated text
-        return response.choices[0].message.content
-    except Exception as e:
-        return f"An error occurred: {e}"
-
-# Test the function
-if __name__ == "__main__":
-    user_prompt = "Explain quantum computing in one simple sentence."
-    print("AI Response:", ask_ai(user_prompt))
