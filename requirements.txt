@@ -11,4 +11,3 @@ openai
 python-dotenv
 streamlit-calendar
 python-dateutil
-
