@@ -3,7 +3,7 @@ import sys
 import os
 from pathlib import Path
 import base64
-
+ 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 def page_config(title="Wentworth Smart Academic Planner"):

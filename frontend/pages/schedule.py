@@ -55,5 +55,5 @@ with col_calendar:
         options=CALENDAR_OPTIONS,
         custom_css=custom_css,
         key='calendar',
-    )
+    ) 
     
