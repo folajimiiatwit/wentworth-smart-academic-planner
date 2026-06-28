@@ -6,6 +6,12 @@ from util.config import build_events, CALENDAR_OPTIONS
 ui.page_config()
 ui.render_header()
 
+with st.container():
+    if st.button("Calendar App"):
+        st.switch_page("pages/schedule.py")
+    if st.button("Course Selection"):
+        st.switch_page("pages/courseselection.py")
+
 col_courses, col_calendar = st.columns([1, 3])
 
 if "selected_courses" not in st.session_state:
