@@ -1,37 +1,47 @@
 import streamlit as st
 import ui as ui
 from backend.auth import login_user
-ui.page_config()
-ui.render_header()
+from pathlib import Path
 
-with st.sidebar:
-    st.sidebar.write()
+BASE_DIR = Path(__file__).resolve().parent.parent
 
-# wrap this in a simple true false if a new user or login found
+ui.set_png_as_page_bg(BASE_DIR/ "assets/background.jpg")
 
-if "logged_in" not in st.session_state:
-    st.session_state.logged_in = False
-    st.session_state.username = None
+left, center, right = st.columns([2, 1.5, 2])
 
-if not st.session_state.logged_in:
-    st.subheader("Login")
-    username = st.text_input("Username").strip().lower()
+with center:
+    
+    ui.page_config()
+    ui.render_header()
 
-    if st.button("Login"):
-        if username:
-            result = login_user(username)
-            if "error" in result:
-                st.error(result["error"])
+    with st.sidebar:
+        st.sidebar.write()
+
+    # wrap this in a simple true false if a new user or login found
+
+    if "logged_in" not in st.session_state:
+        st.session_state.logged_in = False
+        st.session_state.username = None
+
+    if not st.session_state.logged_in:
+        st.subheader("Login")
+        username = st.text_input("Username").strip().lower()
+
+        if st.button("Login"):
+            if username:
+                result = login_user(username)
+                if "error" in result:
+                    st.error(result["error"])
+                else:
+                    st.session_state.logged_in = True
+                    st.session_state.username = username
+                    st.rerun()
             else:
-                st.session_state.logged_in = True
-                st.session_state.username = username
-                st.rerun()
-        else:
-            st.warning("Please enter a username.")
-else:
-    st.switch_page("pages/schedule.py")
+                st.warning("Please enter a username.")
+    else:
+        st.switch_page("pages/schedule.py")
 
-# backup in case more pages are necessary
-# if st.button("Page 2"):
-    # st.switch_page("pages/page_2.py")
+    # backup in case more pages are necessary
+    # if st.button("Page 2"):
+        # st.switch_page("pages/page_2.py")
 
