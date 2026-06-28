@@ -12,5 +12,3 @@ st.write("Hi this is where the meat and potatoes of the app will be ")
 with st.container():
     if st.button("Calendar App"):
         st.switch_page("pages/schedule.py")
-    if st.button("Course Selection"):
-        st.switch_page("pages/courseselection.py")

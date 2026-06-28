@@ -17,9 +17,11 @@ CALENDAR_OPTIONS = {
     "initialView": "timeGridWeek",
     "dayHeaderFormat": {"weekday": "long"},
     "allDaySlot": False,
+    "contentHeight": 600,
     "height": 650,
     "expandRows": True,
     "firstDay": 1,
+    "weekends": False,
 }
 
 def get_week_start():
