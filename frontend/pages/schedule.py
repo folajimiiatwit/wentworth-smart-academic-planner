@@ -2,7 +2,11 @@ import streamlit as st
 from streamlit_calendar import calendar
 import ui as ui
 from util.config import build_events, CALENDAR_OPTIONS
+from pathlib import Path
 
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+ui.set_png_as_page_bg(BASE_DIR/ "assets/background.jpg")
 ui.page_config()
 ui.render_header()
 
