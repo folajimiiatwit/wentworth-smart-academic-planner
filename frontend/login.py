@@ -1,5 +1,6 @@
 import streamlit as st
 import ui as ui
+import data as data
 from backend.auth import login_user
 from pathlib import Path
 
