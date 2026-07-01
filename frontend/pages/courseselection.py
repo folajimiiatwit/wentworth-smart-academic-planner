@@ -7,7 +7,7 @@ from pathlib import Path
 
 st.write("Hi this is where the meat and potatoes of the app will be ")
 
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 ui.set_png_as_page_bg(BASE_DIR/ "assets/background.jpg") 
 
