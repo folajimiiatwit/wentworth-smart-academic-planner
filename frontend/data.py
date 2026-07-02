@@ -2,8 +2,53 @@
 # centralize it such that the pages are displaying information from this 
 # have this extend to the others
 import requests
+import subprocess
+import sys
+import time
 
 API_URL = "http://127.0.0.1:8000"
+
+def ensure_backend_running():
+    try:
+        response = requests.get(
+            f"{API_URL}/health",
+            timeout=2
+        )
+
+        if response.status_code == 200:
+            return
+
+    except Exception:
+        pass
+
+    subprocess.Popen(
+        [
+            sys.executable,
+            "-m",
+            "uvicorn",
+            "backend.main:app",
+            "--host",
+            "127.0.0.1",
+            "--port",
+            "8000"
+        ]
+    )
+
+    for _ in range(20):
+        try:
+            response = requests.get(
+                f"{API_URL}/health",
+                timeout=2
+            )
+
+            if response.status_code == 200:
+                return
+
+        except Exception:
+            pass
+
+        time.sleep(0.5)
+        
 def api_available():
     try:
         response = requests.get(f"{API_URL}/health", timeout=3)

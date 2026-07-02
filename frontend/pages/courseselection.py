@@ -1,5 +1,6 @@
 import streamlit as st
 import ui as ui
+import data as data
 ui.page_config()
 ui.render_header()
 from pathlib import Path
@@ -8,6 +9,8 @@ from pathlib import Path
 st.write("Hi this is where the meat and potatoes of the app will be ")
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
+
+data.ensure_backend_running()
 
 ui.set_png_as_page_bg(BASE_DIR/ "assets/background.jpg") 
 
