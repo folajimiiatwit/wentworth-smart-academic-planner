@@ -15,7 +15,6 @@ Students can upload an unofficial transcript in:
 
 - PDF
 - DOCX
-- TXT
 
 The application automatically:
 
