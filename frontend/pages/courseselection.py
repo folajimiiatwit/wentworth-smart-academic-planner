@@ -39,25 +39,31 @@ tab1, tab2, tab3, tab4 = st.tabs([
 with tab1:
     st.subheader("Transcript Upload")
     #Way to upload files here
+    transcript_upload_section() 
 
     st.divider()
 
     st.subheader("Add Course Manually")
     #Way to add courses manually here (preferable by typing course name (eg. COMP), course number, and title(optional))
+    manual_course_section()
 
 with tab2:
     #show result of transcript analysis 
+    completed_courses_section()
 
     st.divider()
+    #where to update credits for electives
+    elective_data = elective_section(elective_saved)
 
     #save results
+    save_section(elective_data)
 with tab3:
     #see current progress
-    st.divider()
+    progress_section()
 
 with tab4:
     #button to generate curiculum map
-    st.divider()
+    curriculum_map_section()
 
 st.divider()
 
@@ -70,6 +76,6 @@ with bottom_right:
 #* note to self add a view of the calendar and split it in half such that there's the ability to pick classes and stuff while watching in real time 
 # page flow will be 
 
-with st.container():
-    if st.button("Calendar App"):
-        st.switch_page("pages/schedule.py")
+#with st.container():
+#   if st.button("Calendar App"):
+#        st.switch_page("pages/schedule.py")
