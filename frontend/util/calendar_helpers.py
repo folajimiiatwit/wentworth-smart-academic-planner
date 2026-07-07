@@ -95,7 +95,7 @@ def show_calendar(schedule):
         },
         "allDaySlot": False,
         "slotMinTime": "08:00:00",
-        "slotMaxTime": "18:00:00",
+        "slotMaxTime": "23:00:00",
         "slotDuration": "00:30:00",
         "height": 650,
         "expandRows": True,
