@@ -236,7 +236,6 @@ python -m uvicorn backend.main:app --reload
 - Integrate directly with Wentworth's student information system.
 - Add advisor approval workflows.
 - Recommend courses across multiple future semesters.
-- Cloud deployment for public use.
 - Authentication using Wentworth credentials.
 
 ---
