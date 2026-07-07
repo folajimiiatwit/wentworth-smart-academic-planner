@@ -1,4 +1,12 @@
-# will hold methods identifying completed courses
+"""
+Purpose:
+Provides helper functions for formatting and organizing course data.
+
+Main responsibilities:
+- Group courses by subject or category
+- Create unique course section identifiers
+- Format course labels for display in the schedule builder
+"""
 def group_courses(courses):
     grouped = {}
 

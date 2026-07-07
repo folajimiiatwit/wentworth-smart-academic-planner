@@ -1,3 +1,19 @@
+"""
+FastAPI backend entry point.
+
+This file defines the main API endpoints used by the Streamlit frontend.
+It connects authentication, course data, transcript parsing, schedule planning,
+degree progress tracking, and AI curriculum-map generation.
+
+Main responsibilities:
+- Handle username login
+- Return required, eligible, and blocked courses
+- Save completed course and elective information
+- Parse uploaded transcripts
+- Check schedule conflicts
+- Return graduation progress
+- Generate AI curriculum maps
+"""
 from fastapi import FastAPI, UploadFile, File
 from backend.models import (
     LoginRequest,

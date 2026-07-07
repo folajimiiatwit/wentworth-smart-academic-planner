@@ -1,3 +1,15 @@
+"""
+Shared Streamlit UI utilities.
+
+This file contains reusable styling and layout functions used across the
+frontend pages.
+
+Main responsibilities:
+- Configure Streamlit page settings
+- Render the shared application header
+- Set a background image
+- Keep styling code separate from page logic
+"""
 import streamlit as st
 import sys
 import os

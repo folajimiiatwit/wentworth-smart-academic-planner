@@ -1,3 +1,15 @@
+"""
+Login page.
+
+This Streamlit page is the entry point of the application.
+
+Main responsibilities:
+- Display the username login form
+- Check backend availability
+- Send login requests to the backend
+- Store login status and username in Streamlit session state
+- Redirect logged-in users to the schedule page
+"""
 import streamlit as st
 import ui as ui
 import data as data

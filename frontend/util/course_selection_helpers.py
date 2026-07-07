@@ -1,5 +1,18 @@
-# will hold helper methods for course selections
-# will hold helper methods for course selections
+"""
+Purpose:
+Provides reusable UI sections for the Course Selection page.
+
+Main responsibilities:
+- Check that the user is logged in
+- Load saved user course data
+- Handle transcript upload
+- Handle manual course entry
+- Display completed courses
+- Collect elective credits
+- Save completed course information
+- Display degree progress
+- Display AI curriculum map results
+"""
 import streamlit as st
 import data as data
 

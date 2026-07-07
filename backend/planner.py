@@ -1,3 +1,14 @@
+"""
+Purpose:
+Contains academic planning and schedule logic.
+
+Main responsibilities:
+- Evaluate prerequisite requirements
+- Determine eligible courses
+- Determine blocked courses
+- Check selected courses for time conflicts
+- Calculate degree progress and remaining requirements
+"""
 from datetime import datetime
 import re
 

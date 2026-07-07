@@ -1,6 +1,12 @@
-# call api stuff here 
-# centralize it such that the pages are displaying information from this 
-# have this extend to the others
+"""
+Purpose:
+This provides helper functions for formatting and organizing course data.
+
+Main responsibilities:
+- Group courses by subject or category
+- Create unique course section identifiers
+- Format course labels for display in the schedule builder
+"""
 import requests
 import subprocess
 import sys

@@ -1,3 +1,15 @@
+"""
+Purpose:
+Handles reading and writing application data.
+
+Main responsibilities:
+- Load required course data
+- Load semester course offerings
+- Load and update user progress
+- Save completed required courses
+- Save custom completed courses
+- Save elective credit information
+"""
 from pathlib import Path
 import pandas as pd
 

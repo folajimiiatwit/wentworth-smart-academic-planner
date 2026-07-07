@@ -1,3 +1,13 @@
+"""
+Purpose:
+Generates an AI-assisted curriculum map for a student.
+
+Main responsibilities:
+- Build a prompt using completed courses and remaining requirements
+- Send the prompt to the OpenAI API
+- Return a semester-by-semester recommendation
+- Avoid recommending courses when all requirements are complete
+"""
 import json
 from dotenv import load_dotenv
 from openai import OpenAI

@@ -1,3 +1,18 @@
+"""
+Course Selection page.
+
+This Streamlit page allows students to manage completed academic information
+before building a schedule.
+
+Main responsibilities:
+- Upload and analyze transcripts
+- Add completed courses manually
+- Display completed required and custom courses
+- Enter completed elective credits
+- Save completed information to the backend
+- Display degree progress
+- Generate an AI curriculum map
+"""
 import streamlit as st
 import ui as ui
 import data as data

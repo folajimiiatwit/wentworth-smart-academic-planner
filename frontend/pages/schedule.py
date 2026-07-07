@@ -1,3 +1,16 @@
+"""
+Schedule Builder page.
+
+This Streamlit page allows students to select eligible course sections and
+view their schedule in a calendar layout.
+
+Main responsibilities:
+- Load eligible courses from the backend
+- Load blocked courses when prerequisites are not met
+- Allow students to select course sections
+- Check selected courses for time conflicts
+- Display selected courses in a calendar view
+"""
 import streamlit as st
 from streamlit_calendar import calendar
 import ui as ui

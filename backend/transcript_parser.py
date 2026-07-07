@@ -1,3 +1,14 @@
+"""
+Purpose:
+Extracts completed courses from uploaded transcript files.
+
+Main responsibilities:
+- Extract text from PDF, DOCX, and TXT transcripts (Currently TXT is not working)
+- Ignore courses listed under COURSE(S) IN PROGRESS
+- Ignore failed or withdrawn courses
+- Identify completed course codes
+- Separate required courses from custom or transfer courses
+"""
 import re
 from io import BytesIO
 from docx import Document

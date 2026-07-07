@@ -1,3 +1,16 @@
+"""
+Pydantic request models for backend API endpoints.
+
+This file defines the expected structure of request bodies sent from the
+frontend to the FastAPI backend.
+
+Main responsibilities:
+- Validate login requests
+- Validate completed course submissions
+- Validate custom completed courses
+- Validate schedule-check requests
+- Validate AI curriculum-map requests
+"""
 from pydantic import BaseModel
 from typing import List
 

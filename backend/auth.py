@@ -1,3 +1,12 @@
+"""
+Purpose:
+Handles username-based account creation and login.
+
+Main responsibilities:
+- Validate usernames
+- Create a new user if the username does not already exist
+- Return saved user information for returning users
+"""
 import pandas as pd
 from backend.data_manager import load_users, save_users, ELECTIVE_COLUMNS
 def login_user(username):

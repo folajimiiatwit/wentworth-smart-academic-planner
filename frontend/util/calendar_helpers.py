@@ -1,4 +1,14 @@
-# will hold helper method(s) for creating calendar
+"""
+Purpose:
+This provides helper functions for displaying selected courses on a calendar.
+
+Main responsibilities:
+- Convert course meeting days into calendar days
+- Normalize course start and end times
+- Assign colors to course subjects
+- Build calendar events from selected courses
+- Render the Streamlit calendar view
+"""
 import datetime
 from streamlit_calendar import calendar
 

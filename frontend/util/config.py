@@ -1,3 +1,14 @@
+"""
+Calendar configuration utilities.
+
+This file stores shared calendar settings and event-building helpers used by
+the schedule page.
+
+Main responsibilities:
+- Define calendar display options
+- Convert course data into calendar events
+- Keep calendar configuration separate from page logic
+"""
 from datetime import datetime, timedelta
 
 DAY_MAP = {
