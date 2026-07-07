@@ -257,7 +257,3 @@ python -m uvicorn backend.main:app --reload
 - Schedule visualization
 
 ---
-
-# License
-
-This project was developed as part of the **Wentworth Institute of Technology Computer Science Senior Project** and is intended for educational and research purposes.
