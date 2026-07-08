@@ -23,6 +23,24 @@ def build_curriculum_prompt(
     elective_details,
     semester_courses,
 ):
+    """
+    Generates an AI-assisted curriculum map for a student.
+
+    This function builds a curriculum-planning prompt, sends it to the OpenAI
+    chat completion API, and returns a semester-by-semester recommendation.
+    If the AI request fails, it returns an error message instead of stopping
+    the application.
+
+    Args:
+        completed_required_courses (list): Required courses the student has already completed.
+        remaining_required_courses (list): Required courses the student still needs to complete.
+        elective_details (dict): Elective credit progress and remaining elective requirements.
+        semester_courses (list): Courses available in upcoming semesters.
+
+    Returns:
+        str: The generated curriculum map, or an error message if generation fails.
+    """
+    
     return f"""
 You are an academic planning assistant for a Computer Science student at Wentworth.
 
