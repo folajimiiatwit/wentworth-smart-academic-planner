@@ -12,6 +12,7 @@ Main responsibilities:
 import re
 from io import BytesIO
 from docx import Document
+import pdfplumber
 
 PASSING_GRADES = {
     "A","A-",
@@ -80,7 +81,6 @@ def extract_text_from_pdf(file_bytes):
     Returns:
         str: Extracted transcript text from all readable pages.
     """
-    import pdfplumber
 
     parts = []
 
