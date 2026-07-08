@@ -246,12 +246,12 @@ python -m uvicorn backend.main:app --reload
 - Backend development
 - Transcript parser
 - AI Curriculum Map
-- Backend/frontend integration
 - Degree progress tracking
 
 **Ben**
 - Frontend development
 - User interface
+- Backend/frontend integration
 - Calendar integration
 - Schedule visualization
 
