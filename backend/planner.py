@@ -103,13 +103,23 @@ def tokenize_prerequisite_rule(rule):
 
 def evaluate_prerequisite_rule(prerequisite_text, completed_courses):
     """
-    Evaluates prerequisite rules with &, |, and parentheses.
+    Evaluates whether a student has satisfied a prerequisite rule.
+
+    The rule can include course codes, AND conditions using `&`, OR conditions
+    using `|`, and grouped conditions using parentheses.
 
     Examples:
-    COMP1000
-    COMP1000|ELEC3150
-    COMP1000&MATH2300
-    COMP1050&(MATH2300|MATH2800)
+        COMP1000
+        COMP1000|ELEC3150
+        COMP1000&MATH2300
+        COMP1050&(MATH2300|MATH2800)
+
+    Args:
+        prerequisite_text (str): Prerequisite rule from the course data.
+        completed_courses (list[str]): Course codes already completed by the student.
+
+    Returns:
+        bool: True if the prerequisite rule is satisfied, otherwise False.
     """
     prerequisite_text = str(prerequisite_text).strip()
 

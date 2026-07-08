@@ -1,11 +1,12 @@
 """
 Purpose:
-This provides helper functions for formatting and organizing course data.
+Provides frontend helper functions for communicating with the FastAPI backend.
 
 Main responsibilities:
-- Group courses by subject or category
-- Create unique course section identifiers
-- Format course labels for display in the schedule builder
+- Check whether the backend API is available
+- Start the backend server when needed
+- Send login, course, transcript, progress, and schedule requests
+- Return backend API responses to the Streamlit frontend
 """
 import requests
 import subprocess

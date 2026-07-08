@@ -1,4 +1,15 @@
 
+"""
+Purpose:
+Provides a terminal-based demo version of the Wentworth Smart Academic Planner. (ONLY used during 1st presentation and has no significance to final product)
+
+Main responsibilities:
+- Allow users to log in from the terminal
+- Display required, eligible, and blocked courses
+- Save completed course and elective information
+- Check selected schedules for conflicts
+- Show degree-progress information without using the Streamlit frontend
+"""
 from backend.auth import login_user
 from backend.data_manager import (
     load_required_courses,
@@ -16,12 +27,30 @@ from backend.planner import (
 
 
 def print_header(title):
+    """
+    Prints a formatted section header in the terminal.
+
+    Args:
+        title (str): Header text to display.
+
+    Returns:
+        None
+    """
     print("\n" + "=" * 65)
     print(title)
     print("=" * 65)
 
 
 def required_input(prompt):
+    """
+    Repeatedly prompts the user until a non-empty value is entered.
+
+    Args:
+        prompt (str): Text shown to the user.
+
+    Returns:
+        str: The non-empty user input.
+    """
     while True:
         value = input(prompt).strip()
         if value:
@@ -30,6 +59,19 @@ def required_input(prompt):
 
 
 def int_input(prompt, minimum=0, maximum=100, allow_blank=False, current=0):
+    """
+    Prompts the user for an integer within a valid range.
+
+    Args:
+        prompt (str): Text shown to the user.
+        minimum (int): Lowest allowed value.
+        maximum (int): Highest allowed value.
+        allow_blank (bool): Whether the user may leave the input blank.
+        current (int): Value returned when blank input is allowed.
+
+    Returns:
+        int: The validated integer entered by the user.
+    """
     while True:
         value = input(prompt).strip()
 
@@ -50,10 +92,28 @@ def int_input(prompt, minimum=0, maximum=100, allow_blank=False, current=0):
 
 
 def parse_codes(text):
+    """
+    Converts comma-separated course codes into a cleaned list.
+
+    Args:
+        text (str): Comma-separated course-code text.
+
+    Returns:
+        list[str]: Uppercase course codes with extra spaces removed.
+    """
     return [item.strip().upper() for item in text.split(",") if item.strip()]
 
 
 def get_custom_codes(username):
+    """
+    Retrieves custom completed course codes for a user.
+
+    Args:
+        username (str): Username whose custom courses should be retrieved.
+
+    Returns:
+        list[str]: Custom completed course codes, or an empty list if retrieval fails.
+    """
     try:
         from backend.data_manager import get_custom_completed_courses
         return [course["course_code"] for course in get_custom_completed_courses(username)]
@@ -62,10 +122,31 @@ def get_custom_codes(username):
 
 
 def get_all_completed_codes(username):
+    """
+    Combines required and custom completed course codes for a user.
+
+    Args:
+        username (str): Username whose completed courses should be retrieved.
+
+    Returns:
+        list[str]: All completed course codes for the user.
+    """
     return get_completed_required_courses(username) + get_custom_codes(username)
 
 
 def save_custom_course(username, code, number, title):
+    """
+    Saves a custom completed course for a user if it does not already exist.
+
+    Args:
+        username (str): Username associated with the custom course.
+        code (str): Full course code.
+        number (str): Course number.
+        title (str): Course title.
+
+    Returns:
+        bool: True if the course is saved successfully, otherwise False.
+    """
     try:
         from backend.data_manager import get_custom_completed_courses, save_custom_completed_courses
         custom = get_custom_completed_courses(username)
@@ -85,6 +166,16 @@ def save_custom_course(username, code, number, title):
 
 
 def show_courses(courses, limit=50):
+    """
+    Displays course records in the terminal.
+
+    Args:
+        courses (list[dict]): Course records to display.
+        limit (int): Maximum number of courses to show.
+
+    Returns:
+        None
+    """
     if not courses:
         print("No courses found.")
         return

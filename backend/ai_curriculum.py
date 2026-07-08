@@ -24,12 +24,11 @@ def build_curriculum_prompt(
     semester_courses,
 ):
     """
-    Generates an AI-assisted curriculum map for a student.
+    Builds the prompt used to generate an AI-assisted curriculum map.
 
-    This function builds a curriculum-planning prompt, sends it to the OpenAI
-    chat completion API, and returns a semester-by-semester recommendation.
-    If the AI request fails, it returns an error message instead of stopping
-    the application.
+    The prompt includes the student's completed required courses, remaining
+    required courses, elective progress, and available semester courses. It also
+    gives the AI model rules for creating a semester-by-semester academic plan.
 
     Args:
         completed_required_courses (list): Required courses the student has already completed.
@@ -38,7 +37,7 @@ def build_curriculum_prompt(
         semester_courses (list): Courses available in upcoming semesters.
 
     Returns:
-        str: The generated curriculum map, or an error message if generation fails.
+        str: A formatted prompt to send to the AI model.
     """
     
     return f"""
@@ -87,6 +86,23 @@ def generate_curriculum_map(
     elective_details,
     semester_courses,
 ):
+    """
+    Generates an AI-assisted curriculum map for a student.
+
+    This function builds a curriculum-planning prompt, sends it to the OpenAI
+    chat completion API, and returns a semester-by-semester recommendation.
+    If the AI request fails, it returns an error message instead of stopping
+    the application.
+
+    Args:
+        completed_required_courses (list): Required courses the student has already completed.
+        remaining_required_courses (list): Required courses the student still needs to complete.
+        elective_details (dict): Elective credit progress and remaining elective requirements.
+        semester_courses (list): Courses available in upcoming semesters.
+
+    Returns:
+        str: The generated curriculum map, or an error message if generation fails.
+    """
     prompt = build_curriculum_prompt(
         completed_required_courses,
         remaining_required_courses,

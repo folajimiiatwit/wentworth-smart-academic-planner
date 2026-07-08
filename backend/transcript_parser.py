@@ -3,7 +3,7 @@ Purpose:
 Extracts completed courses from uploaded transcript files.
 
 Main responsibilities:
-- Extract text from PDF, DOCX, and TXT transcripts (Currently TXT is not working)
+- Extract text from PDF, DOCX, and TXT transcripts (Currently TXT is not working and won't be made avaliable to upload)
 - Ignore courses listed under COURSE(S) IN PROGRESS
 - Ignore failed or withdrawn courses
 - Identify completed course codes
