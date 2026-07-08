@@ -41,6 +41,18 @@ STOP_MARKERS = [
 
 
 def extract_text_from_docx(file_bytes):
+    """
+    Extract transcript text from a DOCX file.
+
+    Both paragraph text and table cell text are included because transcripts may store
+    course information in either format.
+
+    Args:
+        file_bytes (bytes): Raw DOCX file content.
+
+    Returns:
+        str: Extracted transcript text.
+    """
     document = Document(BytesIO(file_bytes))
     parts = []
 
@@ -60,8 +72,13 @@ def extract_text_from_docx(file_bytes):
 
 def extract_text_from_pdf(file_bytes):
     """
-    Extract text from a PDF transcript using pdfplumber.
-    Install with: pip install pdfplumber
+    Extract transcript text from a PDF file using pdfplumber.
+
+    Args:
+        file_bytes (bytes): Raw PDF file content.
+
+    Returns:
+        str: Extracted transcript text from all readable pages.
     """
     import pdfplumber
 
@@ -77,10 +94,32 @@ def extract_text_from_pdf(file_bytes):
 
 
 def extract_text_from_txt(file_bytes):
+    """
+    Extract transcript text from a plain-text file.
+
+    Args:
+        file_bytes (bytes): Raw TXT file content.
+
+    Returns:
+        str: Decoded transcript text.
+    """
     return file_bytes.decode("utf-8", errors="ignore")
 
 
 def extract_text_from_file(filename, file_bytes):
+    """
+    Select the correct transcript text extractor based on file extension.
+
+    Supported extensions include `.docx`, `.pdf`, and `.txt`. Unknown file types are
+    processed as plain text.
+
+    Args:
+        filename (str): Uploaded transcript filename.
+        file_bytes (bytes): Raw uploaded file content.
+
+    Returns:
+        str: Extracted transcript text.
+    """
     filename = filename.lower()
 
     if filename.endswith(".docx"):
@@ -97,7 +136,15 @@ def extract_text_from_file(filename, file_bytes):
 
 def remove_in_progress_section(text):
     """
-    Do not count courses listed after COURSES IN PROGRESS.
+    Remove transcript sections that list courses currently in progress.
+
+    Courses after the configured stop marker should not count as completed courses.
+
+    Args:
+        text (str): Full transcript text.
+
+    Returns:
+        str: Transcript text before any in-progress section.
     """
     upper_text = text.upper()
 
@@ -114,6 +161,15 @@ def remove_in_progress_section(text):
 
 
 def normalize_lines(text):
+    """
+    Convert transcript text into a clean list of non-empty lines.
+
+    Args:
+        text (str): Raw transcript text.
+
+    Returns:
+        list[str]: Trimmed non-empty transcript lines.
+    """
     lines = []
 
     for line in text.splitlines():
@@ -125,6 +181,17 @@ def normalize_lines(text):
 
 
 def is_valid_subject(subject):
+    """
+    Check whether a detected subject prefix looks like a real course subject.
+
+    Semester words and common non-course words are rejected to reduce false matches.
+
+    Args:
+        subject (str): Candidate course subject prefix.
+
+    Returns:
+        bool: True if the subject appears valid.
+    """
     subject = subject.strip().upper()
 
     if not re.fullmatch(r"[A-Z]{3,5}", subject):
@@ -140,12 +207,31 @@ def is_valid_subject(subject):
 
 
 def looks_like_course_number(value):
+    """
+    Check whether a value looks like a four-digit course number.
+
+    Args:
+        value (str): Candidate course number.
+
+    Returns:
+        bool: True if the value is exactly four digits.
+    """
     return bool(re.fullmatch(r"\d{4}", value.strip()))
 
 
 def is_valid_course_pair(subject, number):
     """
-    Prevent false matches like FALL2025, SPRING2024, etc.
+    Validate a subject and course-number pair before treating it as a course.
+
+    This prevents transcript headings such as `FALL 2025` from being mistaken for
+    course codes.
+
+    Args:
+        subject (str): Candidate course subject.
+        number (str): Candidate four-digit course number.
+
+    Returns:
+        bool: True if the pair appears to represent a course.
     """
     subject = subject.strip().upper()
     number = number.strip()
@@ -165,15 +251,16 @@ def is_valid_course_pair(subject, number):
 
 def extract_completed_courses_from_text(text):
     """
-    Extract completed courses from a Wentworth-style transcript.
+    Extract completed course codes from transcript text.
 
-    Supports:
-    - DOCX transcript text where subject and number may appear on separate lines
-    - PDF transcript text where subject and number may appear on the same line
+    Only courses with passing grades are included. Courses in progress, failed
+    courses, withdrawn courses, and semester headings are ignored.
 
-    Avoids:
-    - COURSES IN PROGRESS
-    - semester labels such as FALL 2025 or FALL2024
+    Args:
+        text (str): Extracted transcript text.
+
+    Returns:
+        list[str]: Sorted completed course codes.
     """
     completed = set()
     safe_text = remove_in_progress_section(text)
@@ -209,6 +296,16 @@ def extract_completed_courses_from_text(text):
 
 
 def split_required_and_custom(extracted_codes, required_course_codes):
+    """
+    Separate extracted transcript courses into required and custom completed courses.
+
+    Args:
+        extracted_codes (list[str]): Course codes found in the transcript.
+        required_course_codes (list[str]): Required course codes for the program.
+
+    Returns:
+        tuple: Completed required course codes and custom completed course records.
+    """
     required_set = set(str(code).strip().upper() for code in required_course_codes)
 
     completed_required = []

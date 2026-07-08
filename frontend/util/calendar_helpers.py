@@ -14,6 +14,15 @@ from streamlit_calendar import calendar
 
 
 def course_days_to_calendar_days(days_text):
+    """
+    Convert course meeting-day abbreviations into FullCalendar weekday numbers.
+
+    Args:
+        days_text (str): Meeting-day text such as `MWF` or `TR`.
+
+    Returns:
+        list[int]: FullCalendar weekday numbers for Monday through Friday.
+    """
     days_text = str(days_text).upper().replace(" ", "")
     days = []
 
@@ -32,6 +41,15 @@ def course_days_to_calendar_days(days_text):
 
 
 def normalize_calendar_time(time_text):
+    """
+    Normalize a course meeting time for calendar display.
+
+    Args:
+        time_text (str): Time string in 24-hour or 12-hour format.
+
+    Returns:
+        str | None: Time formatted as `HH:MM:SS`, or None if parsing fails.
+    """
     value = str(time_text).strip().lower()
 
     for fmt in ["%H:%M", "%I:%M%p", "%I:%M %p"]:
@@ -45,6 +63,15 @@ def normalize_calendar_time(time_text):
 
 
 def course_color(course_code):
+    """
+    Choose a display color based on a course subject prefix.
+
+    Args:
+        course_code (str): Course code such as `COMP1000`.
+
+    Returns:
+        str: Hex color value for calendar display.
+    """
     prefix = "".join(
         [char for char in str(course_code) if char.isalpha()]
     ).upper()
@@ -65,6 +92,15 @@ def course_color(course_code):
 
 
 def build_calendar_events(schedule):
+    """
+    Build FullCalendar event dictionaries from selected course records.
+
+    Args:
+        schedule (list[dict]): Selected course records.
+
+    Returns:
+        list[dict]: Calendar event dictionaries.
+    """
     events = []
 
     for course in schedule:
@@ -96,6 +132,12 @@ def build_calendar_events(schedule):
 
 
 def show_calendar(schedule):
+    """
+    Render the selected schedule in a Streamlit weekly calendar.
+
+    Args:
+        schedule (list[dict]): Selected course records to display.
+    """
     options = {
         "initialView": "timeGridWeek",
         "headerToolbar": {

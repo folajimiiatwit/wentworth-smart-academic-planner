@@ -53,28 +53,64 @@ app = FastAPI(title="Wentworth Smart Academic Planner API")
 
 @app.get("/health")
 def health_check():
+    """
+    Return a simple status response confirming that the FastAPI backend is running.
+
+    Returns:
+        dict: Backend health status.
+    """
     return {"status": "running"}
 
 
 @app.post("/login")
 def login(request: LoginRequest):
+    """
+    Handle login requests from the frontend.
+
+    Args:
+        request (LoginRequest): Login request containing the username.
+
+    Returns:
+        dict: Login result returned by the authentication helper.
+    """
     return login_user(request.username)
 
 
 @app.get("/required-courses")
 def required_courses():
+    """
+    Return all required courses with subject grouping information.
+
+    Returns:
+        list[dict]: Required course records.
+    """
     required_df = add_course_groups(load_required_courses())
     return required_df.to_dict(orient="records")
 
 
 @app.get("/semester-courses")
 def semester_courses():
+    """
+    Return all available semester courses with subject grouping information.
+
+    Returns:
+        list[dict]: Semester course records.
+    """
     semester_df = add_course_groups(load_semester_courses())
     return semester_df.to_dict(orient="records")
 
 
 @app.get("/completed-info/{username}")
 def completed_info(username: str):
+    """
+    Return saved completed-course and elective-credit information for a user.
+
+    Args:
+        username (str): Username whose saved progress should be retrieved.
+
+    Returns:
+        dict: Completed required courses, custom completed courses, and elective credits.
+    """
     return {
         "username": username,
         "completed_required_courses": get_completed_required_courses(username),
@@ -85,6 +121,15 @@ def completed_info(username: str):
 
 @app.post("/save-completed-info")
 def save_completed(request: CompletedCoursesRequest):
+    """
+    Save required-course completions and elective credit totals for a user.
+
+    Args:
+        request (CompletedCoursesRequest): Completed course and elective credit data.
+
+    Returns:
+        dict: Confirmation message.
+    """
     elective_data = {
         "general_elective_credits": request.general_elective_credits,
         "cs_elective_credits": request.cs_elective_credits,
@@ -101,6 +146,15 @@ def save_completed(request: CompletedCoursesRequest):
 
 @app.post("/save-custom-completed")
 def save_custom_completed(request: CustomCompletedCoursesRequest):
+    """
+    Save custom or transfer completed courses for a user.
+
+    Args:
+        request (CustomCompletedCoursesRequest): Custom completed course data.
+
+    Returns:
+        dict: Confirmation message.
+    """
     custom_courses = [
         course.dict()
         for course in request.custom_completed_courses
@@ -112,6 +166,15 @@ def save_custom_completed(request: CustomCompletedCoursesRequest):
 
 @app.get("/eligible-courses/{username}")
 def eligible_courses(username: str):
+    """
+    Return semester courses the user is eligible to take based on completed courses.
+
+    Args:
+        username (str): Username whose completed courses should be checked.
+
+    Returns:
+        list[dict]: Eligible semester course records.
+    """
     semester_df = load_semester_courses()
     completed = get_all_completed_course_codes(username)
     eligible = get_eligible_semester_courses(semester_df, completed)
@@ -120,6 +183,15 @@ def eligible_courses(username: str):
 
 @app.get("/blocked-courses/{username}")
 def blocked_courses(username: str):
+    """
+    Return semester courses blocked by unmet prerequisites.
+
+    Args:
+        username (str): Username whose completed courses should be checked.
+
+    Returns:
+        list[dict]: Blocked course records with prerequisite reasons.
+    """
     semester_df = load_semester_courses()
     completed = get_all_completed_course_codes(username)
     return get_blocked_semester_courses(semester_df, completed)
@@ -127,18 +199,37 @@ def blocked_courses(username: str):
 
 @app.get("/progress/{username}")
 def progress(username: str):
+    """
+    Return degree-progress information for a user.
+
+    Args:
+        username (str): Username whose progress should be calculated.
+
+    Returns:
+        dict: Required-course, elective, and total progress summary.
+    """
     required_df = load_required_courses()
     completed = get_completed_required_courses(username)
     elective_credits = get_elective_credits(username)
     return required_progress(required_df, completed, elective_credits)
 
 
-
-
-
-
 @app.post("/parse-transcript")
 async def parse_transcript(file: UploadFile = File(...)):
+    """
+    Parses an uploaded transcript file and identifies completed courses.
+
+    This endpoint reads the uploaded transcript, extracts text from the file,
+    identifies course codes found in the transcript, and separates them into
+    required courses and custom/non-required courses.
+
+    Args:
+        file (UploadFile): The uploaded transcript file, such as a PDF or DOCX.
+
+    Returns:
+        dict: A dictionary containing the uploaded filename, all extracted
+        course codes, completed required courses, and custom completed courses.
+    """
     file_bytes = await file.read()
     transcript_text = extract_text_from_file(file.filename, file_bytes)
     extracted_codes = extract_completed_courses_from_text(transcript_text)
@@ -161,6 +252,19 @@ async def parse_transcript(file: UploadFile = File(...)):
 
 @app.post("/save-transcript-courses")
 def save_transcript_courses(request: TranscriptSaveRequest):
+    """
+    Saves transcript-based completed course information for a user.
+
+    This endpoint saves the user's completed required courses, elective credit
+    information, and any custom completed courses extracted from the transcript.
+
+    Args:
+        request (TranscriptSaveRequest): The request body containing the username,
+        completed required courses, and custom completed courses.
+
+    Returns:
+        dict: A confirmation message indicating that transcript courses were saved.
+    """
     elective_data = get_elective_credits(request.username)
 
     save_completed_info(
@@ -179,15 +283,31 @@ def save_transcript_courses(request: TranscriptSaveRequest):
     return {"message": "Transcript courses saved"}
 
 
-
-
 @app.post("/check-schedule")
 def check_selected_schedule(request: ScheduleCheckRequest):
+    """
+    Check a selected schedule for credit totals and time conflicts.
+
+    Args:
+        request (ScheduleCheckRequest): Selected course-section identifiers.
+
+    Returns:
+        dict: Selected schedule, total credits, and detected conflicts.
+    """
     semester_df = load_semester_courses()
     return check_schedule(semester_df, request.selected_courses)
 
 @app.post("/curriculum-map")
 def curriculum_map(request: CurriculumMapRequest):
+    """
+    Send a prompt to the OpenAI chat model and return the generated response.
+
+    Args:
+        prompt (str): User prompt to send to the AI model.
+
+    Returns:
+        str: Generated model response, or an error message if the request fails.
+    """
     required_df = load_required_courses()
     semester_df = load_semester_courses()
 

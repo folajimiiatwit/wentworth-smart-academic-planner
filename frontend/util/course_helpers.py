@@ -8,6 +8,15 @@ Main responsibilities:
 - Format course labels for display in the schedule builder
 """
 def group_courses(courses):
+    """
+    Group course records by their subject or category group.
+
+    Args:
+        courses (list[dict]): Course records to group.
+
+    Returns:
+        dict: Course records grouped by subject/category.
+    """
     grouped = {}
 
     for course in courses:
@@ -22,6 +31,18 @@ def group_courses(courses):
 
 
 def section_id(course):
+    """
+    Return a unique identifier for a course section.
+
+    The CRN is used when available; otherwise the function falls back to
+    `course_code-section`.
+
+    Args:
+        course (dict): Course section record.
+
+    Returns:
+        str: Unique section identifier.
+    """
     if "crn" in course and str(course["crn"]).strip() != "":
         return str(course["crn"])
 
@@ -29,6 +50,15 @@ def section_id(course):
 
 
 def section_label(course):
+    """
+    Build a human-readable label for a course section.
+
+    Args:
+        course (dict): Course section record.
+
+    Returns:
+        str: Display label containing code, section, CRN, title, days, and times.
+    """
     return (
         f'{course["course_code"]}-{course["section"]} '
         f'CRN {course.get("crn", "")}: '

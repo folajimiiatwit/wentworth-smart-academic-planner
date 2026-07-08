@@ -19,6 +19,12 @@ import base64
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 def page_config(title="Wentworth Smart Academic Planner"):
+    """
+    Apply shared Streamlit page settings for the application.
+
+    Args:
+        title (str): Browser page title to display for the Streamlit app.
+    """
     st.set_page_config(
         page_title=title,
         layout="wide",
@@ -32,6 +38,9 @@ def page_config(title="Wentworth Smart Academic Planner"):
     """, unsafe_allow_html=True)
 
 def render_header():
+    """
+    Render the shared application title and version header.
+    """
     st.markdown("""
     <style>
         [data-testid="collapsedControl"] { display: none }
@@ -51,6 +60,12 @@ def render_header():
 
 
 def set_background(image_file: str):
+    """
+    Set a background image for the current Streamlit page.
+
+    Args:
+        image_file (str): Path to the image file to use as the background.
+    """
     image_path = Path(image_file)
 
     with open(image_path, "rb") as image:
@@ -97,11 +112,26 @@ def set_background(image_file: str):
 
 @st.cache_data()
 def get_base64_of_bin_file(bin_file):
+    """
+    Read a binary file and return its Base64-encoded string.
+
+    Args:
+        bin_file (str | pathlib.Path): Path to the binary file.
+
+    Returns:
+        str: Base64-encoded file content.
+    """
     with open(bin_file, 'rb') as f:
         data = f.read()
     return base64.b64encode(data).decode()
 
 def set_png_as_page_bg(png_file):
+    """
+    Set a PNG image as the Streamlit page background.
+
+    Args:
+        png_file (str | pathlib.Path): Path to the PNG background image.
+    """
     bin_str = get_base64_of_bin_file(png_file)
     page_bg_img = '''
     <style>

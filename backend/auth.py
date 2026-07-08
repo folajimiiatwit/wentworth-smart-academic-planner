@@ -10,6 +10,20 @@ Main responsibilities:
 import pandas as pd
 from backend.data_manager import load_users, save_users, ELECTIVE_COLUMNS
 def login_user(username):
+  """
+  Authenticate a user by username and create a new user record when needed.
+
+  The username is normalized by trimming whitespace and converting it to lowercase.
+  If the username does not already exist in the users CSV file, this function creates
+  an empty user profile with no completed courses and zero elective credits.
+
+  Args:
+      username (str): Username entered by the student.
+
+  Returns:
+      dict: A success message and normalized username, or an error message for an
+      invalid blank username.
+  """
   username = username.strip().lower()
   if username=="":
     return {"error": "invalid username"}

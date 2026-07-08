@@ -24,6 +24,17 @@ ELECTIVE_REQUIREMENTS = {
 
 
 def get_course_group(course_code):
+    """
+    Extract the subject prefix from a course code.
+
+    Examples include `COMP` from `COMP1000` and `MATH` from `MATH2300`.
+
+    Args:
+        course_code (str): Full course code.
+
+    Returns:
+        str: Uppercase subject group, or `OTHER` when no subject prefix is found.
+    """
     match = re.match(r"([A-Za-z]+)", str(course_code).strip())
     if match:
         return match.group(1).upper()
@@ -31,19 +42,44 @@ def get_course_group(course_code):
 
 
 def add_course_groups(df):
+    """
+    Add a subject group column to a course DataFrame.
+
+    Args:
+        df (pandas.DataFrame): Course data containing a `course_code` column.
+
+    Returns:
+        pandas.DataFrame: Copy of the input DataFrame with an added `group` column.
+    """
     df = df.copy()
     df["group"] = df["course_code"].apply(get_course_group)
     return df
 
 
 def clean_course_code(course_code):
+    """
+    Normalize a course code by converting it to text and trimming whitespace.
+
+    Args:
+        course_code (str): Course code to clean.
+
+    Returns:
+        str: Cleaned course code.
+    """
     return str(course_code).strip()
 
 
 def tokenize_prerequisite_rule(rule):
     """
-    Tokenizes prerequisite expressions such as:
-    COMP1050&(MATH2300|MATH2800)
+    Split a prerequisite expression into course-code and operator tokens.
+
+    Supported operators are `&` for AND, `|` for OR, and parentheses for grouping.
+
+    Args:
+        rule (str): Prerequisite expression such as `COMP1050&(MATH2300|MATH2800)`.
+
+    Returns:
+        list[str]: Ordered prerequisite tokens.
     """
     rule = str(rule).replace(" ", "").strip()
     tokens = []
@@ -131,6 +167,16 @@ def evaluate_prerequisite_rule(prerequisite_text, completed_courses):
 
 
 def missing_prerequisites(prerequisite_text, completed_courses):
+    """
+    Return a human-readable prerequisite warning when requirements are not met.
+
+    Args:
+        prerequisite_text (str): Prerequisite rule from the course data.
+        completed_courses (list[str]): Course codes already completed by the student.
+
+    Returns:
+        str: Empty string when prerequisites are met, otherwise an explanation.
+    """
     prerequisite_text = str(prerequisite_text).strip()
 
     if prerequisite_text == "" or prerequisite_text.lower() == "nan":
@@ -143,6 +189,19 @@ def missing_prerequisites(prerequisite_text, completed_courses):
 
 
 def get_eligible_semester_courses(semester_courses_df, completed_courses):
+    """
+    Find semester courses the student is eligible to take.
+
+    Completed courses are excluded, and remaining courses are checked against their
+    prerequisite rules.
+
+    Args:
+        semester_courses_df (pandas.DataFrame): Available semester course offerings.
+        completed_courses (list[str]): Course codes already completed by the student.
+
+    Returns:
+        pandas.DataFrame: Eligible course offerings with subject groups added.
+    """
     eligible_rows = []
 
     for _, row in semester_courses_df.iterrows():
@@ -162,6 +221,16 @@ def get_eligible_semester_courses(semester_courses_df, completed_courses):
 
 
 def get_blocked_semester_courses(semester_courses_df, completed_courses):
+    """
+    Find semester courses blocked by unmet prerequisites.
+
+    Args:
+        semester_courses_df (pandas.DataFrame): Available semester course offerings.
+        completed_courses (list[str]): Course codes already completed by the student.
+
+    Returns:
+        list[dict]: Blocked course records with a prerequisite reason.
+    """
     blocked = []
 
     for _, row in semester_courses_df.iterrows():
@@ -182,6 +251,16 @@ def get_blocked_semester_courses(semester_courses_df, completed_courses):
 
 
 def elective_progress(elective_credits):
+    """
+    Calculate progress for each elective credit category.
+
+    Args:
+        elective_credits (dict): Completed elective credits by category.
+
+    Returns:
+        tuple: A list of elective progress dictionaries, total completed elective
+        credits, and total required elective credits.
+    """
     results = []
     total_completed = 0
     total_required = 0
@@ -218,6 +297,17 @@ def elective_progress(elective_credits):
 
 
 def required_progress(required_courses_df, completed_required_courses, elective_credits):
+    """
+    Calculate required-course, elective, and total degree progress.
+
+    Args:
+        required_courses_df (pandas.DataFrame): Required course catalog data.
+        completed_required_courses (list[str]): Required course codes completed by the user.
+        elective_credits (dict): Completed elective credits by category.
+
+    Returns:
+        dict: Degree progress summary, elective details, and remaining required courses.
+    """
     total_required_credits = int(required_courses_df["credits"].sum())
     completed_df = required_courses_df[required_courses_df["course_code"].isin(completed_required_courses)]
     completed_required_credits = int(completed_df["credits"].sum())
@@ -250,8 +340,15 @@ def required_progress(required_courses_df, completed_required_courses, elective_
 
 def time_to_minutes(time_text):
     """
-    Convert time text into minutes.
-    Supports both 24-hour times like 13:30 and 12-hour times like 03:30pm.
+    Convert a time string into minutes after midnight.
+
+    Supports 24-hour time such as `13:30` and 12-hour time such as `03:30pm`.
+
+    Args:
+        time_text (str): Time value to convert.
+
+    Returns:
+        int | None: Minutes after midnight, or None if the value cannot be parsed.
     """
     time_text = str(time_text).strip().lower()
 
@@ -269,10 +366,33 @@ def time_to_minutes(time_text):
 
 
 def days_overlap(days_1, days_2):
+    """
+    Check whether two course meeting-day lists share at least one day.
+
+    Args:
+        days_1 (list): First course meeting days.
+        days_2 (list): Second course meeting days.
+
+    Returns:
+        bool: True if the courses meet on at least one common day.
+    """
     return any(day in days_2 for day in days_1)
 
 
 def courses_conflict(course_1, course_2):
+    """
+    Determine whether two course sections have a schedule conflict.
+
+    Two courses conflict when they meet on at least one shared day and their meeting
+    times overlap.
+
+    Args:
+        course_1 (dict): First selected course section.
+        course_2 (dict): Second selected course section.
+
+    Returns:
+        bool: True if the course sections overlap; False otherwise.
+    """
     if not days_overlap(course_1["days"], course_2["days"]):
         return False
 
@@ -288,6 +408,15 @@ def courses_conflict(course_1, course_2):
 
 
 def find_conflicts(selected_courses_df):
+    """
+    Find all pairwise schedule conflicts among selected courses.
+
+    Args:
+        selected_courses_df (pandas.DataFrame): Selected course sections.
+
+    Returns:
+        list[dict]: Conflicting course-section pairs.
+    """
     conflicts = []
     rows = list(selected_courses_df.iterrows())
 
@@ -306,6 +435,16 @@ def find_conflicts(selected_courses_df):
 
 
 def check_schedule(semester_courses_df, selected_course_sections):
+    """
+    Build a selected schedule and report total credits and conflicts.
+
+    Args:
+        semester_courses_df (pandas.DataFrame): Available semester course offerings.
+        selected_course_sections (list[str]): Selected CRNs or course-section IDs.
+
+    Returns:
+        dict: Selected schedule records, total credits, and detected conflicts.
+    """
     semester_courses_df = semester_courses_df.copy()
     if "crn" in semester_courses_df.columns:
         semester_courses_df["course_section"] = semester_courses_df["crn"].astype(str)

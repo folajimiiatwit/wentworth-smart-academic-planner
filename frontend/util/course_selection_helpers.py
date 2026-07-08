@@ -18,6 +18,12 @@ import data as data
 
 
 def require_login():
+    """
+    Require an active logged-in user before showing the course selection page.
+
+    If the user is not logged in or the backend is unavailable, the Streamlit page is
+    stopped to prevent the rest of the page from rendering.
+    """
     if "logged_in" not in st.session_state:
         st.session_state.logged_in = False
 
@@ -38,6 +44,12 @@ def require_login():
 
 
 def load_user_data():
+    """
+    Load saved course-completion data for the logged-in user into session state.
+
+    Returns:
+        dict: Saved elective credit totals for the user.
+    """
     saved = data.get_completed_info(st.session_state.username).json()
 
     if "completed_required_courses" not in st.session_state:
@@ -56,6 +68,12 @@ def load_user_data():
 
 
 def transcript_upload_section():
+    """
+    Render the transcript upload interface and import completed courses from a file.
+
+    Uploaded transcripts are sent to the backend for parsing. Imported required and
+    custom courses are merged into Streamlit session state.
+    """
     st.subheader("Upload Transcript")
 
     uploaded_file = st.file_uploader(
@@ -94,7 +112,11 @@ def transcript_upload_section():
 
 
 def manual_course_section():
+    """
+    Render the manual course-entry form and add completed courses to session state.
 
+    Required courses are stored separately from custom or transfer courses.
+    """
     with st.form("manual_course_form"):
         col1, col2, col3 = st.columns([1, 1, 3])
 
@@ -155,6 +177,11 @@ def manual_course_section():
 
 
 def completed_courses_section():
+    """
+    Display completed required courses and custom completed courses.
+
+    The custom course list also supports removing selected courses from session state.
+    """
     col1, col2 = st.columns(2)
 
     with col1:
@@ -202,6 +229,15 @@ def completed_courses_section():
 
 
 def elective_section(elective_saved):
+    """
+    Render elective credit inputs and return the entered values.
+
+    Args:
+        elective_saved (dict): Previously saved elective credit totals.
+
+    Returns:
+        dict: Updated elective credit totals entered by the user.
+    """
     st.subheader("Completed Elective Credits")
 
     col1, col2 = st.columns(2)
@@ -263,6 +299,12 @@ def elective_section(elective_saved):
 
 
 def save_section(elective_data):
+    """
+    Render the save button and persist completed course information.
+
+    Args:
+        elective_data (dict): Elective credit totals to save.
+    """
     if st.button("Save Completed Information"):
         completed_response = data.save_completed_info(
             st.session_state.username,
@@ -284,6 +326,12 @@ def save_section(elective_data):
 
 
 def progress_section():
+    """
+    Render the user's degree-progress summary.
+
+    The section displays required credits remaining, required-course progress,
+    elective progress, and remaining required courses.
+    """
     st.subheader("Progress")
     
     response = data.get_progress(st.session_state.username)
@@ -316,6 +364,9 @@ def progress_section():
 
 
 def curriculum_map_section():
+    """
+    Render the AI curriculum-map generator and display the generated plan.
+    """
     st.subheader("AI Curriculum Map")
 
     if "curriculum_map_result" not in st.session_state:

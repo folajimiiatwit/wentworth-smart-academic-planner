@@ -36,10 +36,25 @@ CALENDAR_OPTIONS = {
 }
 
 def get_week_start():
+    """
+    Return the date for the Monday of the current week.
+
+    Returns:
+        datetime: Date and time representing the current week's Monday.
+    """
     today = datetime.today()
     return today - timedelta(days=today.weekday())
 
 def build_events(courses):
+    """
+    Convert course records into dated calendar events for the schedule page.
+
+    Args:
+        courses (list[dict]): Course records with title, days, start time, and end time.
+
+    Returns:
+        list[dict]: Calendar event dictionaries with start and end datetimes.
+    """
     week_start = get_week_start()
     events = []
     for course in courses:
