@@ -62,8 +62,3 @@ with center:
                 st.warning("Please enter a username.")
     else:
         st.switch_page("pages/schedule.py")
-
-    # backup in case more pages are necessary
-    # if st.button("Page 2"):
-        # st.switch_page("pages/page_2.py")
-
