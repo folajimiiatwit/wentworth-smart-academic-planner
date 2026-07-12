@@ -37,7 +37,6 @@ ui.set_png_as_page_bg(BASE_DIR/ "assets/background.jpg")
 ui.page_config()
 ui.render_header()
 st.title("Course Selection")
-st.caption("Manage completed courses, elective credits, and degree progress.")
 
 if st.button("Return to Schedule Builder"):
     st.switch_page("pages/schedule.py")

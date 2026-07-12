@@ -31,7 +31,6 @@ ui.render_header()
 require_login()
 
 st.title("Schedule Builder")
-st.caption("Build your semester schedule from eligible courses.")
 
 if st.button("Course Selection"):
     st.switch_page("pages/courseselection.py")
@@ -106,19 +105,17 @@ with col_calendar:
         result_response = data.check_schedule(selected)
         if result_response.status_code == 200:
             result = result_response.json()
-
-            if st.radio("View schedule as", ["Calendar View", "Table View"], horizontal=True) == "Calendar View":
-                show_calendar(result["schedule"])
-            else:
-                st.dataframe(result["schedule"], width="stretch")
-
             st.write(f'Total credits: **{result["total_credits"]}**')
- 
             if result["conflicts"]:
                 st.error("Schedule conflicts found.")
                 st.dataframe(result["conflicts"], width="stretch")
             else:
-                st.success("No schedule conflicts found.")    
+                st.success("No schedule conflicts found.") 
+            if st.radio("View schedule as", ["Calendar View", "Table View"], horizontal=True) == "Calendar View":
+                show_calendar(result["schedule"])
+            else:
+                st.dataframe(result["schedule"], width="stretch")   
+ 
 #     custom_css = """
 #     .fc-event-time { font-style: italic; }
 #     .fc-event-title { font-weight: 700; }

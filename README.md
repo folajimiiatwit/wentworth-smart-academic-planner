@@ -248,7 +248,7 @@ python -m uvicorn backend.main:app --reload
 - AI Curriculum Map
 - Degree progress tracking
 
-**Ben**
+**Ben Le**
 - Frontend development
 - User interface
 - Backend/frontend integration
