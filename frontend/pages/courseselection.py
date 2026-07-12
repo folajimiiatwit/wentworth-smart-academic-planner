@@ -36,6 +36,9 @@ data.ensure_backend_running()
 ui.set_png_as_page_bg(BASE_DIR/ "assets/background.jpg") 
 ui.page_config()
 ui.render_header()
+
+require_login()
+
 st.title("Course Selection")
 
 if st.button("Return to Schedule Builder"):
