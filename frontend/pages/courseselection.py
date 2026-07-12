@@ -29,8 +29,6 @@ from frontend.util.course_selection_helpers import (
     curriculum_map_section
 )
 
-st.write("Hi this is where the meat and potatoes of the app will be ")
-
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 data.ensure_backend_running()
@@ -40,6 +38,9 @@ ui.page_config()
 ui.render_header()
 st.title("Course Selection")
 st.caption("Manage completed courses, elective credits, and degree progress.")
+
+if st.button("Return to Schedule Builder"):
+    st.switch_page("pages/schedule.py")
 
 
 elective_saved = load_user_data()
@@ -84,10 +85,6 @@ st.divider()
 
 bottom_left, bottom_right = st.columns([4, 1])
 
-#move to calandar page
-with bottom_right:
-    if st.button("Schedule Builder", width="stretch"):
-        st.switch_page("pages/schedule.py")
 #* note to self add a view of the calendar and split it in half such that there's the ability to pick classes and stuff while watching in real time 
 # page flow will be 
 
