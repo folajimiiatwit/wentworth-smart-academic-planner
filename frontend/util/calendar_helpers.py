@@ -142,15 +142,17 @@ def show_calendar(schedule):
         "initialView": "timeGridWeek",
         "headerToolbar": {
             "left": "",
-            "center": "title",
+            "center": "",
             "right": ""
         },
         "allDaySlot": False,
+        "dayHeaderFormat": {"weekday": "long"},
         "slotMinTime": "08:00:00",
         "slotMaxTime": "23:00:00",
         "slotDuration": "00:30:00",
         "height": 650,
         "expandRows": True,
+        "firstDay": 1,
         "weekends": False,
         "hiddenDays": [0, 6]
     }
