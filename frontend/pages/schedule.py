@@ -82,8 +82,6 @@ with col_calendar:
             if result["conflicts"]:
                 st.error("Schedule conflicts found.")
                 st.dataframe(result["conflicts"], width="stretch")
-            else:
-                st.success("No schedule conflicts found.") 
             if st.radio("View schedule as", ["Calendar View", "Table View"], horizontal=True) == "Calendar View":
                 show_calendar(result["schedule"])
             else:
