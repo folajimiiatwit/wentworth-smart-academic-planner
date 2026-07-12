@@ -18,21 +18,21 @@ PASSING_GRADES = {
     "A","A-",
     "B+","B","B-",
     "C+","C","C-",
-    "D+","D","S","TR"
+    "D+","D","S","TR",
 }
 
 FAILING_GRADES = {
-    "F", "W", "D-"
+    "F", "W", "D-",
 
 }
 
 SEMESTER_WORDS = {
-    "FALL", "SPRING", "SUMMER", "WINTER", "TERM", "YEAR"
+    "FALL", "SPRING", "SUMMER", "WINTER", "TERM", "YEAR",
 }
 
 NON_COURSE_WORDS = {
     "GPA", "UG", "CEU", "WEB", "TOP", "THE", "AND", "FOR", "NOT",
-    "TOTAL", "TOTALS", "CURRENT", "CUMULATIVE", "OVERALL"
+    "TOTAL", "TOTALS", "CURRENT", "CUMULATIVE", "OVERALL",
 }
 
 STOP_MARKERS = [
@@ -40,6 +40,11 @@ STOP_MARKERS = [
     
 ]
 
+GRADE_PATTERN = (
+    r"(?<![A-Z0-9])"
+    r"(A-|A|B\+|B-|B|C\+|C-|C|D\+|D-|D|TR|P|S|F|W|WF|WU|NC|I)"
+    r"(?![A-Z0-9])"
+)
 
 def extract_text_from_docx(file_bytes):
     """
@@ -282,7 +287,7 @@ def extract_completed_courses_from_text(text):
         if not is_valid_course_pair(subject, number):
             continue
 
-        grade_matches = re.findall(rf"\b{grade_pattern}\b", line)
+        grade_matches = re.findall(GRADE_PATTERN, line)
 
         if not grade_matches:
             continue
