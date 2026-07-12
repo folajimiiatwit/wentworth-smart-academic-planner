@@ -12,7 +12,7 @@ Main responsibilities:
 - Save completed information to the backend
 - Display degree progress
 - Generate an AI curriculum map
-"""
+""" 
 import streamlit as st
 import ui as ui
 import data as data
