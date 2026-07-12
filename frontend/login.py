@@ -18,7 +18,7 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 data.ensure_backend_running()
-ui.set_png_as_page_bg(BASE_DIR/ "assets/background.jpg") 
+ui.set_png_as_page_bg(BASE_DIR/ "assets/oldbackground.jpg") 
 
 left, center, right = st.columns([2, 1.5, 2])
 
