@@ -30,9 +30,13 @@ SEMESTER_WORDS = {
     "FALL", "SPRING", "SUMMER", "WINTER", "TERM", "YEAR",
 }
 
+EXCLUDED_SUBJECTS = {
+    "COOP"
+}
+
 NON_COURSE_WORDS = {
     "GPA", "UG", "CEU", "WEB", "TOP", "THE", "AND", "FOR", "NOT",
-    "TOTAL", "TOTALS", "CURRENT", "CUMULATIVE", "OVERALL",
+    "TOTAL", "TOTALS", "CURRENT", "CUMULATIVE", "OVERALL", "COOP",
 }
 
 STOP_MARKERS = [
@@ -63,13 +67,13 @@ def extract_text_from_docx(file_bytes):
     parts = []
 
     for paragraph in document.paragraphs:
-        text = paragraph.text.strip()
+        text = re.sub(r"\s+", " ", paragraph.text).strip()
         if text:
             parts.append(text)
 
     for table in document.tables:
         for row in table.rows:
-            cells = [cell.text.strip() for cell in row.cells]
+            cells = [re.sub(r"\s+", " ", cell.text).strip() for cell in row.cells]
             if any(cells):
                 parts.append("\t".join(cells))
 
@@ -91,9 +95,33 @@ def extract_text_from_pdf(file_bytes):
 
     with pdfplumber.open(BytesIO(file_bytes)) as pdf:
         for page in pdf.pages:
-            text = page.extract_text() or ""
-            if text.strip():
-                parts.append(text)
+            words = page.extract_words(
+                use_text_flow=True,
+                keep_blank_chars=False
+            )
+
+            if not words:
+                continue
+
+            visual_lines = {}
+            tolerance = 3
+
+            for word in words:
+                row_position = round(word["top"] / tolerance) * tolerance
+                visual_lines.setdefault(row_position, []).append(word)
+
+            for row_position in sorted(visual_lines):
+                row_words = sorted(
+                    visual_lines[row_position],
+                    key=lambda item: item["x0"]
+                )
+
+                line = " ".join(
+                    word["text"] for word in row_words
+                ).strip()
+
+                if line:
+                    parts.append(line)
 
     return "\n".join(parts)
 
@@ -151,18 +179,16 @@ def remove_in_progress_section(text):
     Returns:
         str: Transcript text before any in-progress section.
     """
-    upper_text = text.upper()
+    match = re.search(
+        r"COURSE\s*\(S\)\s*IN\s*PROGRESS|COURSES?\s*IN\s*PROGRESS",
+        text,
+        flags=re.IGNORECASE
+    )
 
-    cut_positions = []
-    for marker in STOP_MARKERS:
-        position = upper_text.find(marker)
-        if position != -1:
-            cut_positions.append(position)
+    if match:
+        return text[:match.start()]
 
-    if not cut_positions:
-        return text
-
-    return text[:min(cut_positions)]
+    return text
 
 
 def normalize_lines(text):
@@ -206,6 +232,9 @@ def is_valid_subject(subject):
         return False
 
     if subject in NON_COURSE_WORDS:
+        return False
+    
+    if subject in EXCLUDED_SUBJECTS:
         return False
 
     return True
@@ -253,6 +282,34 @@ def is_valid_course_pair(subject, number):
 
     return True
 
+def combine_course_rows(lines):
+    """
+    Combine wrapped transcript lines into complete course records.
+
+    A new record starts whenever a line contains a subject and four-digit
+    course number. Following wrapped lines are added until the next course
+    begins.
+    """
+    rows = []
+    current_row = ""
+
+    for line in lines:
+        starts_course = bool(
+            re.search(r"\b[A-Z]{3,5}\s+\d{4}\b", line)
+        )
+
+        if starts_course:
+            if current_row:
+                rows.append(current_row.strip())
+
+            current_row = line
+        elif current_row:
+            current_row += " " + line
+
+    if current_row:
+        rows.append(current_row.strip())
+
+    return rows
 
 def extract_completed_courses_from_text(text):
     """
@@ -269,30 +326,33 @@ def extract_completed_courses_from_text(text):
     """
     completed = set()
     safe_text = remove_in_progress_section(text)
-    safe_text_upper = safe_text.upper()
+    lines = normalize_lines(safe_text.upper())
+    course_rows = combine_course_rows(lines)
 
-    grade_pattern = r"(A-|A|B\+|B-|B|C\+|C-|C|D\+|D|TR|P|S|F|W|WF|WU|NC|I|D-)"
-
-    lines = normalize_lines(safe_text_upper)
-
-    for line in lines:
-        match = re.search(r"\b([A-Z]{3,5})\s+(\d{4})\b", line)
+    for row in course_rows:
+        match = re.search(
+        r"\b([A-Z]{3,5})\s+(\d{4})\b",
+        row
+        )
 
         if not match:
             continue
 
-        subject = match.group(1)
-        number = match.group(2)
+        subject, number = match.groups()
 
         if not is_valid_course_pair(subject, number):
+          continue
+
+        grade_match = re.search(
+            r"(A-|A|B\+|B-|B|C\+|C-|C|D\+|D-|D|TR|P|S|F|W|WF|WU|NC|I)"
+            r"\s+\d+\.\d{3}\s+\d+\.\d{2}\b",
+            row
+        )
+
+        if not grade_match:
             continue
 
-        grade_matches = re.findall(GRADE_PATTERN, line)
-
-        if not grade_matches:
-            continue
-
-        grade = grade_matches[-1].upper()
+        grade = grade_match.group(1).upper()
 
         if grade in PASSING_GRADES:
             completed.add(f"{subject}{number}")
