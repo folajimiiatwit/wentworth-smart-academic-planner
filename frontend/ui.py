@@ -54,7 +54,7 @@ def render_header():
     </style>
     <div class="header-style">
         <h1>Wentworth Smart Academic Planner</h1>
-        <p>TESTING Version 0.010</p>
+        <p>TESTING Version 0.5</p>
     </div>
     """, unsafe_allow_html=True)
 
