@@ -78,36 +78,81 @@ If all graduation requirements have already been completed, the application info
 # Project Structure
 
 ```
-wentworth-smart-academic-planner
+wentworth-smart-academic-planner/
 │
-├── backend
+├── backend/
 │   ├── auth.py
 │   ├── curriculum_ai.py
 │   ├── data_manager.py
 │   ├── main.py
 │   ├── planner.py
 │   ├── transcript_parser.py
-│   └── data
+│   └── data/
 │
-├── frontend
+├── frontend/
 │   ├── data.py
 │   ├── login.py
 │   ├── ui.py
-│   ├── util
+│   ├── util/
 │   │   ├── calendar_helpers.py
 │   │   ├── course_helpers.py
 │   │   └── course_selection_helpers.py
-│   │
-│   └── pages
+│   └── pages/
 │       ├── courseselection.py
 │       └── schedule.py
 │
-├── assets
+├── data/
+├── assets/
+│
+├── documentation/
+│   ├── Final_Design_and_Project_Report.pdf
+│   ├── Final_Design_and_Project_Report.docx
+│   ├── User_Manual.md
+│   ├── Developer_Manual.md
+│   ├── Project_Goals_Evaluation.md
+│   ├── Known_Issues_and_Limitations.md
+│   ├── diagrams/
+│   ├── testing/
+│   ├── notes/
+│   └── presentation/
+│
+├── .env.example
+├── .gitignore
+├── README.md
 ├── requirements.txt
-├── .env
-└── README.md
+└── terminal_demo.py
 ```
+```markdown
+# Project Documentation
 
+The final project documentation is available in the
+[`documentation`](documentation/) folder.
+
+## Main Documents
+
+- [Final Design and Project Report — PDF](documentation/Final_Design_and_Project_Report.pdf)
+- [Final Design and Project Report — DOCX](documentation/Final_Design_and_Project_Report.docx)
+- [User Manual](documentation/User_Manual.md)
+- [Developer Manual](documentation/Developer_Manual.md)
+- [Project Goals Evaluation](documentation/Project_Goals_Evaluation.md)
+- [Known Issues and Limitations](documentation/Known_Issues_and_Limitations.md)
+- [Testing Report](documentation/testing/Testing_Report.md)
+
+## Design Diagrams
+
+- [System Architecture](documentation/diagrams/System_Architecture.md)
+- [Component Diagram](documentation/diagrams/Component_Diagram.md)
+- [Transcript Processing Workflow](documentation/diagrams/Transcript_Workflow.md)
+- [Use Case Diagram](documentation/diagrams/Use_Case_Diagram.md)
+
+## Project Notes
+
+- [Interesting and Unexpected Findings](documentation/notes/Interesting_Unexpected_and_Confusing_Items.md)
+- [Lessons Learned](documentation/notes/Lessons_Learned.md)
+
+## Presentation
+
+- [Final Project Presentation](documentation/presentation/Final_Presentation.pptx)
 ---
 
 # Technologies Used
