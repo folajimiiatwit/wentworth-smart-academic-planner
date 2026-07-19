@@ -122,7 +122,7 @@ wentworth-smart-academic-planner/
 ├── requirements.txt
 └── terminal_demo.py
 ```
-```markdown
+```
 # Project Documentation
 
 The final project documentation is available in the
