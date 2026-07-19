@@ -140,10 +140,11 @@ The final project documentation is available in the
 
 ## Design Diagrams
 
-- [System Architecture](documentation/diagrams/System_Architecture.md)
-- [Component Diagram](documentation/diagrams/Component_Diagram.md)
-- [Transcript Processing Workflow](documentation/diagrams/Transcript_Workflow.md)
-- [Use Case Diagram](documentation/diagrams/Use_Case_Diagram.md)
+- [System Architecture](documentation/diagrams/System_Architecture.png)
+- [Component Diagram](documentation/diagrams/Component_Diagram.png)
+- [Transcript Processing Workflow](documentation/diagrams/Transcript_Workflow.png)
+- [Use Case Diagram](documentation/diagrams/Use_Case_Diagram.png)
+- [Class Diagram](documentation/diagrams/Class_Diagram.png)
 
 ## Project Notes
 
