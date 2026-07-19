@@ -122,7 +122,7 @@ wentworth-smart-academic-planner/
 ├── requirements.txt
 └── terminal_demo.py
 ```
-```
+
 # Project Documentation
 
 The final project documentation is available in the
@@ -153,6 +153,7 @@ The final project documentation is available in the
 ## Presentation
 
 - [Final Project Presentation](documentation/presentation/Final_Presentation.pptx)
+
 ---
 
 # Technologies Used
