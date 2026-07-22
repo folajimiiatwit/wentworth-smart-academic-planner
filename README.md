@@ -220,7 +220,7 @@ The AI Curriculum Map feature requires an OpenAI API key.
 Run the frontend.
 
 ```bash
-streamlit run frontend/login.py
+python -m streamlit run frontend/login.py
 ```
 
 The frontend automatically starts the backend if it is not already running.
@@ -230,6 +230,8 @@ Alternatively, you can start the backend manually.
 ```bash
 python -m uvicorn backend.main:app --reload
 ```
+
+The Application can also be accessed through this [link](https://wentworth-smart-academic-planner.onrender.com/)
 
 ---
 
