@@ -2,7 +2,7 @@
 
 ## 1. Start the Application
 Start the backend service and then launch the Streamlit frontend.
-Also accessible through this link: https://wentworth-smart-academic-planner.onrender.com/
+Also accessible through this [link](https://wentworth-smart-academic-planner.onrender.com/).
 
 ## 2. Log In
 Enter the required student information on the login page.
