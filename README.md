@@ -130,8 +130,8 @@ The final project documentation is available in the
 
 ## Main Documents
 
-- [Final Design and Project Report — PDF](documentation/Final Design Document and Project Report.pdf)
-- [Final Design and Project Report — DOCX](documentation/Final Design Document and Project Report.docx)
+- [Final Design and Project Report — PDF](documentation/Final_Design_Document_and_Project_Report.pdf)
+- [Final Design and Project Report — DOCX](documentation/Final_Design_Document_and_Project_Report.docx)
 - [User Manual](documentation/User_Manual.md)
 - [Developer Manual](documentation/Developer_Manual.md)
 - [Project Goals Evaluation](documentation/Project_Goals_Evaluation.md)
