@@ -45,27 +45,46 @@ def require_login():
 
 def load_user_data():
     """
-    Load saved course-completion data for the logged-in user into session state.
+    Load and cache saved course information for the active user.
 
-    Returns:
-        dict: Saved elective credit totals for the user.
+    Data is reloaded whenever a different username logs in.
     """
-    saved = data.get_completed_info(st.session_state.username).json()
 
-    if "completed_required_courses" not in st.session_state:
+    username = st.session_state.username.strip().lower()
+
+    if st.session_state.get("data_loaded_for") != username:
+        response = data.get_completed_info(username)
+
+        if response.status_code != 200:
+            st.error("Could not load saved user information.")
+
+            st.session_state.completed_required_courses = []
+            st.session_state.custom_completed_courses = []
+            st.session_state.elective_credits = {}
+            st.session_state.data_loaded_for = username
+
+            return {}
+
+        saved = response.json()
+
         st.session_state.completed_required_courses = saved.get(
             "completed_required_courses",
             []
         )
 
-    if "custom_completed_courses" not in st.session_state:
         st.session_state.custom_completed_courses = saved.get(
             "custom_completed_courses",
             []
         )
 
-    return saved.get("elective_credits", {})
+        st.session_state.elective_credits = saved.get(
+            "elective_credits",
+            {}
+        )
 
+        st.session_state.data_loaded_for = username
+
+    return st.session_state.get("elective_credits", {})
 
 def transcript_upload_section():
     """
