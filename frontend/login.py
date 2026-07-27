@@ -57,6 +57,13 @@ with center:
                     else:
                         st.session_state.logged_in = True
                         st.session_state.username = result["username"]
+                        
+                        st.session_state.pop("data_loaded_for", None)
+                        st.session_state.pop("completed_required_courses", None)
+                        st.session_state.pop("custom_completed_courses", None)
+                        st.session_state.pop("elective_credits", None)
+                        st.session_state.pop("curriculum_map_result", None)
+                        
                         st.rerun()
             else:
                 st.warning("Please enter a username.")
