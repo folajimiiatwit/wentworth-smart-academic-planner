@@ -13,12 +13,16 @@ Main responsibilities:
 from pathlib import Path
 import pandas as pd
 
+from sqlalchemy import select
+
+from backend.database import SessionLocal
+from backend.database_models import User
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = BASE_DIR / "data"
 
 REQUIRED_COURSES_FILE = DATA_DIR / "cs_required_courses.csv"
 SEMESTER_COURSES_FILE = DATA_DIR / "semester_courses.csv"
-USERS_FILE = DATA_DIR / "users.csv"
 
 ELECTIVE_COLUMNS = [
     "general_elective_credits",
@@ -53,41 +57,11 @@ def load_semester_courses():
     return pd.read_csv(SEMESTER_COURSES_FILE).fillna("")
 
 
-def load_users():
+def normalize_username(username: str) -> str:
     """
-    Load saved user progress data and create the users file if it does not exist.
-
-    This function ensures that all expected user-progress columns are present,
-    including completed required courses, custom completed courses, elective credit
-    categories, and planned courses.
-
-    Returns:
-        pandas.DataFrame: User records with all required columns included.
+    Normalize a username before database storage or lookup.
     """
-    columns = ["username", "completed_required_courses", "custom_completed_courses"] + ELECTIVE_COLUMNS + ["planned_courses"]
-
-    if not USERS_FILE.exists():
-        users = pd.DataFrame(columns=columns)
-        users.to_csv(USERS_FILE, index=False)
-
-    users = pd.read_csv(USERS_FILE).fillna("")
-
-    for column in columns:
-        if column not in users.columns:
-            users[column] = 0 if column in ELECTIVE_COLUMNS else ""
-
-    return users[columns]
-
-
-def save_users(users_df):
-    """
-    Save the full users DataFrame back to the users CSV file.
-
-    Args:
-        users_df (pandas.DataFrame): Updated user records to persist.
-    """
-    users_df.to_csv(USERS_FILE, index=False)
-
+    return username.strip().lower()
 
 def get_user(username):
     """
@@ -99,17 +73,53 @@ def get_user(username):
         username (str): Username to search for.
 
     Returns:
-        dict | None: User record as a dictionary, or None if the user is not found.
+        dict | None: Database user record, or None if not found.
     """
-    username = username.strip().lower()
-    users = load_users()
-    row = users[users["username"].astype(str).str.lower() == username]
-    if row.empty:
+    normalized_username = normalize_username(username)
+
+    with SessionLocal() as database:
+        statement = select(User).where(
+            User.username == normalized_username
+        )
+
+        return database.scalar(statement)
+
+def create_user(username: str):
+    """
+    Create a database user if the username does not already exist.
+
+    Args:
+        username: Username to create.
+
+    Returns:
+        User | None: The existing or newly created user.
+    """
+    normalized_username = normalize_username(username)
+
+    if not normalized_username:
         return None
-    return row.iloc[0].to_dict()
 
+    with SessionLocal() as database:
+        existing_user = database.scalar(
+            select(User).where(
+                User.username == normalized_username
+            )
+        )
 
-def get_completed_required_courses(username):
+        if existing_user is not None:
+            return existing_user
+
+        new_user = User(
+            username=normalized_username
+        )
+
+        database.add(new_user)
+        database.commit()
+        database.refresh(new_user)
+
+        return new_user
+
+def get_completed_required_courses(username: str) -> list[str]:
     """
     Return the list of required courses completed by a user.
 
@@ -123,15 +133,19 @@ def get_completed_required_courses(username):
         list[str]: Completed required course codes.
     """
     user = get_user(username)
+
     if user is None:
         return []
-    completed = str(user.get("completed_required_courses", ""))
-    if completed.strip() == "":
-        return []
-    return [course.strip() for course in completed.split(";") if course.strip()]
 
+    completed = user.completed_required_courses or ""
 
-def get_custom_completed_courses(username):
+    return [
+        course.strip()
+        for course in completed.split(";")
+        if course.strip()
+    ]
+
+def get_custom_completed_courses(username: str) -> list[dict]:
     """
     Return the list of custom or transfer courses completed by a user.
 
@@ -146,27 +160,33 @@ def get_custom_completed_courses(username):
         list[dict]: Custom completed course records.
     """
     user = get_user(username)
+
     if user is None:
         return []
 
-    completed = str(user.get("custom_completed_courses", ""))
-    if completed.strip() == "":
+    completed = user.custom_completed_courses or ""
+
+    if not completed.strip():
         return []
 
     custom_courses = []
+
     for item in completed.split(";"):
         parts = item.split("|")
+
         if len(parts) >= 3:
-            custom_courses.append({
-                "course_code": parts[0].strip(),
-                "course_number": parts[1].strip(),
-                "title": parts[2].strip()
-            })
+            custom_courses.append(
+                {
+                    "course_code": parts[0].strip(),
+                    "course_number": parts[1].strip(),
+                    "title": "|".join(parts[2:]).strip(),
+                }
+            )
 
     return custom_courses
 
 
-def get_all_completed_course_codes(username):
+def get_all_completed_course_codes(username: str) -> list[str]:
     """
     Combine required and custom completed course codes for prerequisite checking.
 
@@ -178,11 +198,19 @@ def get_all_completed_course_codes(username):
     """
     required_courses = get_completed_required_courses(username)
     custom_courses = get_custom_completed_courses(username)
-    custom_codes = [course["course_code"] for course in custom_courses]
+
+    custom_codes = [
+        course["course_code"]
+        for course in custom_courses
+    ]
+
     return required_courses + custom_codes
 
 
-def save_custom_completed_courses(username, custom_courses):
+def save_custom_completed_courses(
+        username: str,
+        custom_courses: list[dict],
+    ) -> bool:
     """
     Save a user's custom or transfer completed courses.
 
@@ -196,29 +224,48 @@ def save_custom_completed_courses(username, custom_courses):
     Returns:
         bool: True if the user was found and saved; False otherwise.
     """
-    username = username.strip().lower()
-    users = load_users()
+    normalized_username = normalize_username(username)
 
-    index = users[users["username"].astype(str).str.lower() == username].index
+    with SessionLocal() as database:
+        user = database.scalar(
+            select(User).where(
+                User.username == normalized_username
+            )
+        )
 
-    if len(index) == 0:
-        return False
+        if user is None:
+            return False
 
-    encoded_courses = []
-    for course in custom_courses:
-        course_code = str(course.get("course_code", "")).strip().upper()
-        course_number = str(course.get("course_number", "")).strip()
-        title = str(course.get("title", "")).strip()
+        encoded_courses = []
 
-        if course_code:
-            encoded_courses.append(f"{course_code}|{course_number}|{title}")
+        for course in custom_courses:
+            course_code = str(
+                course.get("course_code", "")
+            ).strip().upper()
 
-    users.loc[index[0], "custom_completed_courses"] = ";".join(encoded_courses)
-    save_users(users)
-    return True
+            course_number = str(
+                course.get("course_number", "")
+            ).strip()
+
+            title = str(
+                course.get("title", "")
+            ).strip()
+
+            if course_code:
+                encoded_courses.append(
+                    f"{course_code}|{course_number}|{title}"
+                )
+
+        user.custom_completed_courses = ";".join(
+            encoded_courses
+        )
+
+        database.commit()
+
+        return True
 
 
-def get_elective_credits(username):
+def get_elective_credits(username: str) -> dict[str, int]:
     """
     Load the user's completed elective credit totals by category.
 
@@ -229,21 +276,31 @@ def get_elective_credits(username):
         dict: Elective credit category names mapped to integer credit totals.
     """
     user = get_user(username)
+
+    if user is None:
+        return {
+            column: 0
+            for column in ELECTIVE_COLUMNS
+        }
+
     credits = {}
 
     for column in ELECTIVE_COLUMNS:
-        if user is None:
+        value = getattr(user, column, 0)
+
+        try:
+            credits[column] = int(value or 0)
+        except (TypeError, ValueError):
             credits[column] = 0
-        else:
-            try:
-                credits[column] = int(user.get(column, 0))
-            except ValueError:
-                credits[column] = 0
 
     return credits
 
 
-def save_completed_info(username, completed_required_courses, elective_credit_data):
+def save_completed_info(
+        username: str,
+        completed_required_courses: list[str],
+        elective_credit_data: dict,
+    ) -> bool:
     """
     Save completed required courses and elective credit totals for a user.
 
@@ -255,17 +312,43 @@ def save_completed_info(username, completed_required_courses, elective_credit_da
     Returns:
         bool: True if the user was found and saved; False otherwise.
     """
-    username = username.strip().lower()
-    users = load_users()
-    index = users[users["username"].astype(str).str.lower() == username].index
+    normalized_username = normalize_username(username)
 
-    if len(index) == 0:
-        return False
+    with SessionLocal() as database:
+        user = database.scalar(
+            select(User).where(
+                User.username == normalized_username
+            )
+        )
 
-    users.loc[index[0], "completed_required_courses"] = ";".join(completed_required_courses)
+        if user is None:
+            return False
 
-    for column in ELECTIVE_COLUMNS:
-        users.loc[index[0], column] = int(elective_credit_data.get(column, 0))
+        cleaned_courses = [
+            str(course).strip().upper()
+            for course in completed_required_courses
+            if str(course).strip()
+        ]
 
-    save_users(users)
-    return True
+        user.completed_required_courses = ";".join(
+            cleaned_courses
+        )
+
+        for column in ELECTIVE_COLUMNS:
+            value = elective_credit_data.get(column, 0)
+
+            try:
+                value = int(value)
+            except (TypeError, ValueError):
+                value = 0
+
+            setattr(
+                user,
+                column,
+                max(value, 0),
+            )
+
+        database.commit()
+
+        return True
+

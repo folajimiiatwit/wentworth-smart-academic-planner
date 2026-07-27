@@ -48,8 +48,22 @@ from backend.planner import (
     check_schedule
 )
 
+from fastapi import (
+    FastAPI,
+    UploadFile,
+    File,
+    HTTPException,
+)
+
+from backend.database import create_database_tables
+
 app = FastAPI(title="Wentworth Smart Academic Planner API")
 
+@app.on_event("startup")
+def startup_event():
+    """Create database tables when the backend starts."""
+
+    create_database_tables()
 
 @app.get("/health")
 def health_check():
@@ -140,7 +154,12 @@ def save_completed(request: CompletedCoursesRequest):
         "ethics_elective_credits": request.ethics_elective_credits
     }
 
-    save_completed_info(request.username, request.completed_required_courses, elective_data)
+    saved=save_completed_info(request.username, request.completed_required_courses, elective_data)
+    if not saved:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found",
+        )
     return {"message": "Completed information saved"}
 
 
@@ -160,7 +179,12 @@ def save_custom_completed(request: CustomCompletedCoursesRequest):
         for course in request.custom_completed_courses
     ]
 
-    save_custom_completed_courses(request.username, custom_courses)
+    saved= save_custom_completed_courses(request.username, custom_courses)
+    if not saved:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found",
+        )
     return {"message": "Custom completed courses saved"}
 
 
@@ -270,8 +294,9 @@ def save_transcript_courses(request: TranscriptSaveRequest):
     save_completed_info(
         request.username,
         request.completed_required_courses,
-        elective_data
+        elective_data,
     )
+
 
     custom_courses = [
         course.dict()
@@ -279,7 +304,7 @@ def save_transcript_courses(request: TranscriptSaveRequest):
     ]
 
     save_custom_completed_courses(request.username, custom_courses)
-
+    
     return {"message": "Transcript courses saved"}
 
 

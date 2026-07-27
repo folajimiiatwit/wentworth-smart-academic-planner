@@ -8,7 +8,7 @@ Main responsibilities:
 - Return saved user information for returning users
 """
 import pandas as pd
-from backend.data_manager import load_users, save_users, ELECTIVE_COLUMNS
+from backend.data_manager import create_user, get_user
 def login_user(username):
   """
   Authenticate a user by username and create a new user record when needed.
@@ -24,24 +24,20 @@ def login_user(username):
       dict: A success message and normalized username, or an error message for an
       invalid blank username.
   """
-  username = username.strip().lower()
-  if username=="":
-    return {"error": "invalid username"}
-  users=load_users()
-  existing_usernames=users["username"].astype(str).str.lower().values
+  normalized_username = username.strip().lower()
 
-  if username not in existing_usernames:
-    new_user_data = {
-      "username":username, "completed_required_courses":"","custom_completed_courses": "",
-      "planned_courses": ""
-    }
+  if not normalized_username:
+    return {"error": "Invalid username"}
 
-    for column in ELECTIVE_COLUMNS:
-      new_user_data[column]=0
+  user = get_user(normalized_username)
 
-    new_user = pd.DataFrame([new_user_data])
-    users=pd.concat([users, new_user], ignore_index=True)
-    save_users(users)
-    
-  return{"message":"Login Successful", "username": username}
-    
+  if user is None:
+    user = create_user(normalized_username)
+
+  if user is None:
+    return {"error": "Could not create user"}
+
+  return {
+    "message": "Login Successful",
+    "username": user.username,
+  }    
