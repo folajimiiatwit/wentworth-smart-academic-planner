@@ -11,3 +11,5 @@ openai
 python-dotenv
 streamlit-calendar
 python-dateutil
+sqlalchemy
+psycopg[binary]
