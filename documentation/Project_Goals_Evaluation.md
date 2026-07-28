@@ -11,5 +11,5 @@
 | Support course selection | Met | Students can review and select eligible courses. |
 | Detect schedule conflicts | Met | Selected sections can be checked for overlap. |
 | Generate a curriculum plan | Met | AI-assisted semester recommendations are supported. |
-| Provide production deployment | Partially met | The application works locally; final cloud deployment may need additional configuration. |
+| Provide production deployment | Met | The application works locally; final cloud deployment may need additional configuration. |
 | Handle every transcript layout | Partially met | Common Wentworth layouts work, but unusual PDF spacing remains an edge case. |
