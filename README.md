@@ -201,20 +201,6 @@ The final project documentation is available in the
 
 # Installation
 
-Clone the repository.
-
-```bash
-git clone https://github.com/folajimiiatwit/wentworth-smart-academic-planner.git
-```
-
-Move into the project directory.
-
-```bash
-cd wentworth-smart-academic-planner
-```
-
-# Installation
-
 Clone the repository:
 
 ```bash
