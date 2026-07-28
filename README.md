@@ -252,12 +252,12 @@ http://127.0.0.1:8000
 
 # Deployment
 
-The application can be deployed using:
+The application has be deployed using:
 
 - Render for the FastAPI and Streamlit services
 - Neon for hosted PostgreSQL storage
 
-In Render, configure the following environment variables:
+In Render, configured are the following environment variables:
 
 ```env
 OPENAI_API_KEY=your_openai_api_key
