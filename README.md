@@ -220,24 +220,23 @@ Clone the repository:
 ```bash
 git clone https://github.com/folajimiiatwit/wentworth-smart-academic-planner.git
 cd wentworth-smart-academic-planner
-
+```
 ---
 
-# OpenAI Setup
+# Environment Configuration
 
-Create a `.env` file in the project root.
+Copy `.env.example` to a local `.env` file:
 
-```text
-OPENAI_API_KEY=your_api_key_here
+```bash
+cp .env.example .env
 ```
 
 The AI Curriculum Map feature requires an OpenAI API key.
 
 ---
-
 # Running the Application
 
-Run the frontend.
+## Option 1: Start the frontend
 
 ```bash
 python -m streamlit run frontend/login.py
@@ -245,15 +244,67 @@ python -m streamlit run frontend/login.py
 
 The frontend automatically starts the backend if it is not already running.
 
-Alternatively, you can start the backend manually.
+## Option 2: Start the services separately
+
+Backend:
 
 ```bash
 python -m uvicorn backend.main:app --reload
 ```
 
+Frontend, in a second terminal:
+
+```bash
+python -m streamlit run frontend/login.py
+```
+
+The FastAPI documentation is available locally at:
+
+```text
+http://127.0.0.1:8000/docs
+```
+
+# Deployment
+
+The application can be deployed using:
+
+- Render for the FastAPI and Streamlit services
+- Neon for hosted PostgreSQL storage
+
+In Render, configure the following environment variables:
+
+```env
+OPENAI_API_KEY=your_openai_api_key
+DATABASE_URL=our_neon_postgresql_connection_string
+```
+
 The Application can also be accessed through this [link](https://wentworth-smart-academic-planner.onrender.com/)
 
 ---
+
+# Data Storage
+
+The application uses two forms of storage.
+
+## Static Academic Data
+
+CSV files continue to store institutional reference data:
+
+- Required Computer Science courses
+- Semester course offerings
+- Prerequisite and scheduling information
+
+## User-Generated Data
+
+A relational database stores:
+
+- Usernames
+- Completed required courses
+- Custom or transfer courses
+- Elective credit totals
+- Planned-course information
+
+The frontend does not communicate directly with the database. It sends requests to FastAPI, and the backend uses SQLAlchemy to retrieve or update database records.
 
 # How to Use
 
@@ -290,12 +341,16 @@ The Application can also be accessed through this [link](https://wentworth-smart
 
 # Design Highlights
 
-- Separation of frontend and backend using REST APIs.
-- Automatic transcript parsing to reduce manual data entry.
-- Personalized degree progress tracking.
-- AI-assisted semester planning.
-- Interactive schedule builder with conflict detection.
-- Modular frontend architecture using reusable helper modules.
+- Separation of the Streamlit frontend and FastAPI backend through REST APIs
+- SQLAlchemy-based persistence layer
+- SQLite support for local development
+- PostgreSQL support for deployed environments
+- Automatic creation and retrieval of user records
+- Automatic transcript parsing to reduce manual data entry
+- Personalized degree-progress tracking
+- AI-assisted semester planning
+- Interactive schedule builder with conflict detection
+- Modular frontend architecture using reusable helper modules
 
 ---
 
