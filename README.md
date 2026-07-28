@@ -1,14 +1,26 @@
 # Wentworth Smart Academic Planner
 
-The **Wentworth Smart Academic Planner** is a web-based application designed to help Wentworth Institute of Technology students plan their path to graduation. The application analyzes a student's completed coursework, tracks graduation progress, recommends future semesters using AI, and helps students build conflict-free class schedules.
+The Wentworth Smart Academic Planner is a web-based application designed to help Wentworth Institute of Technology Computer Science students track degree progress and plan their path to graduation.
+
+The application uses a Streamlit frontend and FastAPI backend. Students can upload unofficial transcripts, review completed coursework, track remaining graduation requirements, build conflict-free schedules, and generate AI-assisted semester plans.
+
+Student accounts and saved academic progress are stored in a relational database using SQLAlchemy. SQLite is used for local development, while PostgreSQL is supported for deployed environments.
 
 ---
 
 ## Features
 
-### Login
-- Simple username-based login
-- Automatically loads previously saved student progress
+### Login and Saved Progress
+
+- Simple username-based prototype login
+- Creates a user database record when a new username is entered
+- Automatically loads previously saved:
+  - Completed required courses
+  - Custom or transfer courses
+  - Elective credit totals
+- Preserves user progress between sessions when persistent database storage is configured
+
+> The current login system is intended for demonstration purposes and does not use passwords or institutional authentication.
 
 ### Transcript Upload
 Students can upload an unofficial transcript in:
@@ -83,11 +95,18 @@ wentworth-smart-academic-planner/
 ├── backend/
 │   ├── auth.py
 │   ├── curriculum_ai.py
+│   ├── database.py
+│   ├── database_models.py
 │   ├── data_manager.py
 │   ├── main.py
 │   ├── planner.py
-│   ├── transcript_parser.py
-│   └── data/
+│   └── transcript_parser.py
+│
+├── data/
+│   ├── cs_required_courses.csv
+│   ├── semester_courses.csv
+│   ├── migrate_users_to_database.py
+│   └── users.csv
 │
 ├── frontend/
 │   ├── data.py
@@ -101,26 +120,12 @@ wentworth-smart-academic-planner/
 │       ├── courseselection.py
 │       └── schedule.py
 │
-├── data/
 ├── assets/
-│
-├── documentation/
-│   ├── Final_Design_and_Project_Report.pdf
-│   ├── Final_Design_and_Project_Report.docx
-│   ├── User_Manual.md
-│   ├── Developer_Manual.md
-│   ├── Project_Goals_Evaluation.md
-│   ├── Known_Issues_and_Limitations.md
-│   ├── diagrams/
-│   ├── testing/
-│   ├── notes/
-│   └── presentation/
-│
 ├── .env.example
 ├── .gitignore
-├── README.md
 ├── requirements.txt
-└── terminal_demo.py
+├── terminal_demo.py
+└── README.md
 ```
 
 # Project Documentation
@@ -169,6 +174,14 @@ The final project documentation is available in the
 - FastAPI
 - Uvicorn
 
+## Database and Persistence
+
+- SQLAlchemy
+- SQLite for local development
+- PostgreSQL for deployed environments
+- Psycopg PostgreSQL driver
+- Neon PostgreSQL hosting
+
 ## Data Processing
 
 - pandas
@@ -178,6 +191,11 @@ The final project documentation is available in the
 ## Artificial Intelligence
 
 - OpenAI GPT-4o API
+
+## Version Control and Deployment
+
+- GitHub
+- Render
 
 ---
 
@@ -195,11 +213,13 @@ Move into the project directory.
 cd wentworth-smart-academic-planner
 ```
 
-Install the required packages.
+# Installation
+
+Clone the repository:
 
 ```bash
-pip install -r requirements.txt
-```
+git clone https://github.com/folajimiiatwit/wentworth-smart-academic-planner.git
+cd wentworth-smart-academic-planner
 
 ---
 
