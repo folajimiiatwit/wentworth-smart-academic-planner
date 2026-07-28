@@ -338,15 +338,38 @@ The frontend does not communicate directly with the database. It sends requests 
 - Interactive schedule builder with conflict detection
 - Modular frontend architecture using reusable helper modules
 
+# Security and Privacy
+
+The current application uses username-only authentication and is intended as an academic prototype.
+
+It should not be used with official student records or sensitive educational data without additional security controls, including:
+
+- Password-based or institutional authentication
+- Wentworth Single Sign-On
+- Authorization controls
+- HTTPS
+- Secure secrets management
+- FERPA-aligned data handling
+- Audit logging
+- Database backups
+
+Unofficial transcripts should be used only with the student's permission.
+
 ---
 
 # Future Improvements
 
-- Support additional academic programs.
-- Integrate directly with Wentworth's student information system.
-- Add advisor approval workflows.
-- Recommend courses across multiple future semesters.
-- Authentication using Wentworth credentials.
+- Add password-based authentication or Wentworth Single Sign-On
+- Integrate with Wentworth's Banner Student Information System
+- Normalize completed courses into separate relational database tables
+- Support additional academic programs
+- Add advisor review and approval workflows
+- Add role-based access control
+- Encrypt sensitive student information
+- Add automated database backups
+- Add account deletion and data-export features
+- Expand transcript compatibility
+- Add automated testing and continuous deployment
 
 ---
 
