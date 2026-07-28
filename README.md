@@ -247,7 +247,7 @@ python -m streamlit run frontend/login.py
 The FastAPI documentation is available locally at:
 
 ```text
-http://127.0.0.1:8000/docs
+http://127.0.0.1:8000
 ```
 
 # Deployment
