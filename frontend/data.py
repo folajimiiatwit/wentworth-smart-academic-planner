@@ -40,8 +40,9 @@ def ensure_backend_running():
         pass
 
     # Do not start a second backend in a deployed environment.
-    if os.getenv("BACKEND_API_URL"):
+    if API_URL not in {"http://127.0.0.1:8000","http://localhost:8000",}:
         raise RuntimeError(
+
             f"Could not connect to deployed backend: {API_URL}"
         )
     subprocess.Popen(
