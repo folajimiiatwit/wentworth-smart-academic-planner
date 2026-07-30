@@ -8,15 +8,17 @@ Main responsibilities:
 - Send login, course, transcript, progress, and schedule requests
 - Return backend API responses to the Streamlit frontend
 """
-import requests
-import subprocess
-import sys
-import time
 import os
 
-API_URL = os.getenv("BACKEND_API_URL","http://127.0.0.1:8000").rstrip("/")
+import requests
 
-def ensure_backend_running():
+
+API_URL = os.getenv(
+    "BACKEND_API_URL",
+    "http://127.0.0.1:8000",
+).rstrip("/")
+
+def ensure_backend_running() -> None:
     """
     Checks whether the FastAPI backend is running and starts it if needed.
 
@@ -30,50 +32,13 @@ def ensure_backend_running():
     try:
         response = requests.get(
             f"{API_URL}/health",
-            timeout=5
+            timeout=5,
         )
-
-        if response.status_code == 200:
-            return
-
-    except requests.RequestException:
-        pass
-
-    # Do not start a second backend in a deployed environment.
-    if API_URL not in {"http://127.0.0.1:8000","http://localhost:8000",}:
+        response.raise_for_status()
+    except requests.RequestException as error:
         raise RuntimeError(
-
-            f"Could not connect to deployed backend: {API_URL}"
-        )
-    subprocess.Popen(
-        [
-            sys.executable,
-            "-m",
-            "uvicorn",
-            "backend.main:app",
-            "--host",
-            "127.0.0.1",
-            "--port",
-            "8000"
-        ]
-    )
-
-    for _ in range(20):
-        try:
-            response = requests.get(
-                f"{API_URL}/health",
-                timeout=2
-            )
-
-            if response.status_code == 200:
-                return
-
-        except requests.RequestException:
-            pass
-
-        time.sleep(0.5)
-
-    raise RuntimeError(" The local backend could not be started.")
+            f"Could not connect to the FastAPI backend at {API_URL}."
+        ) from error
         
 def api_available():
     """
@@ -84,9 +49,12 @@ def api_available():
         otherwise False.
     """
     try:
-        response = requests.get(f"{API_URL}/health", timeout=3)
+        response = requests.get(
+            f"{API_URL}/health",
+            timeout=5,
+        )
         return response.status_code == 200
-    except requests.exceptions.RequestException:
+    except requests.RequestException:
         return False
 
 
