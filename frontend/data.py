@@ -14,7 +14,7 @@ import sys
 import time
 import os
 
-API_URL = os.getenv("BACKEND_API_URL","https://127.0.0.1:8000").rstrip("/")
+API_URL = os.getenv("BACKEND_API_URL","http://127.0.0.1:8000").rstrip("/")
 
 def ensure_backend_running():
     """
