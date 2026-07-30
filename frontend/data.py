@@ -12,8 +12,9 @@ import requests
 import subprocess
 import sys
 import time
+import os
 
-API_URL = "http://127.0.0.1:8000"
+API_URL = os.getenv("BACKEND_API_URL","https://127.0.0.1:8000").rstrip("/")
 
 def ensure_backend_running():
     """
@@ -29,15 +30,20 @@ def ensure_backend_running():
     try:
         response = requests.get(
             f"{API_URL}/health",
-            timeout=2
+            timeout=5
         )
 
         if response.status_code == 200:
             return
 
-    except Exception:
+    except requests.RequestException:
         pass
 
+    # Do not start a second backend in a deployed environment.
+    if os.getenv("BACKEND_API_URL"):
+        raise RuntimeError(
+            f"Could not connect to deployed backend: {API_URL}"
+        )
     subprocess.Popen(
         [
             sys.executable,
@@ -61,10 +67,12 @@ def ensure_backend_running():
             if response.status_code == 200:
                 return
 
-        except Exception:
+        except requests.RequestException:
             pass
 
         time.sleep(0.5)
+
+    raise RuntimeError(" The local backend could not be started.")
         
 def api_available():
     """
