@@ -59,12 +59,6 @@ from backend.database import create_database_tables
 
 app = FastAPI(title="Wentworth Smart Academic Planner API")
 
-@app.on_event("startup")
-def startup_event():
-    """Create database tables when the backend starts."""
-
-    create_database_tables()
-
 @app.get("/health")
 def health_check():
     """
@@ -75,6 +69,11 @@ def health_check():
     """
     return {"status": "running"}
 
+@app.on_event("startup")
+def startup_event():
+    """Create database tables when the backend starts."""
+
+    create_database_tables()
 
 @app.post("/login")
 def login(request: LoginRequest):
